@@ -20,3 +20,19 @@ const AddUser = async (req, res) => {
 
 
 module.exports = AddUser
+const GetUser = async (req, res) => {
+    try {
+        const response = await RegisterModel.find()
+        res.status(200).json({
+            message: "sucessfully fetch data",
+            result: response
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "internel error", error
+        })
+    }
+}
+
+
+module.exports = {AddUser, GetUser}
