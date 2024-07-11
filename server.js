@@ -15,6 +15,7 @@ app.use(process.env.ADMIN_ROUTES, CreateAdmin)
 app.use(process.env.ADMIN_ROUTES, AdminLogin)
 
 // website
+app.use(process.env.WEBSITE_ROUTES,require("./app/website/Profile/Profile.routes"))
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/login/Login.routes"))
 app.use(process.env.WEBSITE_ROUTES,matchdummy)
 
