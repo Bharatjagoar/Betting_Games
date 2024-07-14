@@ -1,5 +1,5 @@
 
-const UserModel = require("../../admin/Users/models/CreateUser.model")
+const UserModel = require("../../admin/Users/models/client.model")
 
 const dummy = [
         {

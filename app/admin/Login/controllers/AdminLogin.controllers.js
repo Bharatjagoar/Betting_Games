@@ -1,8 +1,9 @@
-const UserModel = require("../../Users/models/CreateUser.model")
+const UserModel = require("../../Users/models/Admin.model")
 
 
 const AdminLogin = async (req, res) => {
-    const { username, Password, SecretCode } = req.body;
+    const { username, password } = req.body;
+    console.log(req.body)
 
     try {
         // Find user by username
@@ -12,24 +13,27 @@ const AdminLogin = async (req, res) => {
         }
 
         // Compare password
-        const isPasswordValid = Password === user.Password;
+        const isPasswordValid = password === user.Password;
         if (!isPasswordValid) {
             return res.status(401).json({ message: "Invalid password" });
         }
 
         // Compare secret code
-        const isSecretCodeValid = SecretCode === user.SecretCode;
+        // const isSecretCodeValid = SecretCode === user.SecretCode;
 
-        if (!isSecretCodeValid) {
-            return res.status(401).json({ message: "Invalid secret code" });
-        }
+        // if (!isSecretCodeValid) {
+        //     return res.status(401).json({ message: "Invalid secret code" });
+        // }
 
-        // Create token
-        const token = jwt.sign({ user }, 'MyScretKey', { expiresIn: '5h' });
+        // // Create token
+        // const token = jwt.sign({ user }, 'MyScretKey', { expiresIn: '5h' });
 
         res.status(200).json({
             message: "Login successful",
-            token
+            data: {
+                user: user._id,
+                role: user.userType
+            }
         });
     } catch (error) {
         res.status(500).json({

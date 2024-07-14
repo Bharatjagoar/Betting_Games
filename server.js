@@ -13,6 +13,7 @@ const port = process.env.PORT
 // Admin
 app.use(process.env.ADMIN_ROUTES, CreateAdmin)
 app.use(process.env.ADMIN_ROUTES, AdminLogin)
+app.use(process.env.ADMIN_ROUTES, require("./app/admin/Role/Role.routes"))
 
 // website
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/Profile/Profile.routes"))

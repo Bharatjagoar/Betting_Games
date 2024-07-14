@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const UserModel = require("../../Users/models/CreateUser.model")
+const UserModel = require("../../Users/models/Admin.model")
 
 const logout = async (req, res) => {
     const token = req.headers.LoginToken?.split(' ')[1];
