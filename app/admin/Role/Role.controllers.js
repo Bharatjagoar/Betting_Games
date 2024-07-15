@@ -66,3 +66,51 @@ exports.getUpline = async (req, res) => {
         })
     }
 }
+
+exports.checkuprole = async (req, res) => {
+  try {
+      console.log(req.query.role)
+      const Upline = await RoleModel.aggregate([
+          { $match: { type: req.query.role } }, // Match the given role
+          {
+            $lookup: {
+              from: 'roles', // The collection name should be the same as your roles collection
+              localField: 'level',
+              foreignField: 'level',
+              as: 'currentRole'
+            }
+          },
+          { $unwind: '$currentRole' }, // Unwind the currentRole array
+          {
+            $lookup: {
+              from: 'roles',
+              let: { level: { $subtract: ['$currentRole.level', 1] } },
+              pipeline: [
+                { $match: { $expr: { $eq: ['$level', '$$level'] } } }
+              ],
+              as: 'oneLevelUp'
+            }
+          },
+          { $unwind: '$oneLevelUp' }, // Unwind the oneLevelUp array
+          {
+            $project: {
+              _id: 1,
+              currentrole: '$currentRole.type',
+              onelevelup: '$oneLevelUp.type'
+            }
+          }
+        ]);
+      console.log(Upline)
+      const response = await AdminModel.find({
+          userType: req.query.role
+      })
+      res.status(200).json({
+          message: "sucessfully All dataa fetch data",
+          data: Upline
+      })
+  } catch (error) {
+      res.status(500).json({
+          message: "internel error", error
+      })
+  }
+}

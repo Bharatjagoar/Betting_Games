@@ -1,9 +1,10 @@
 const express = require('express')
-const { getUpline } = require('./Role.controllers')
+const { getUpline, checkuprole } = require('./Role.controllers')
 
 const router = express.Router()
 
 router.get("/getUpline", getUpline)
+router.get("/checkuprole", checkuprole)
 
 
 module.exports = router
