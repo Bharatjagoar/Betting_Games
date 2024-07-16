@@ -12,6 +12,10 @@ const clientschema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    status: {
+        type: Boolean,
+        default: true
+    },
     username: {
         type: String,
         required: true,

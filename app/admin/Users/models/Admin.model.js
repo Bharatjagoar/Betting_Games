@@ -12,6 +12,10 @@ const Adminschema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    status: {
+        type: Boolean,
+        default: true
+    },
     reference: {
         type: String,
     },
