@@ -1,4 +1,5 @@
-const UserModel = require("../../Users/models/Admin.model")
+const UserModel = require("../../Users/models/Admin.model");
+const AdminLoginModel = require("../models/AdminLogin.model");
 
 
 const AdminLogin = async (req, res) => {
@@ -43,4 +44,21 @@ const AdminLogin = async (req, res) => {
     }
 };
 
-module.exports = AdminLogin;
+const LoginDetails = async (req, res) => {
+    try {
+        const {id} = req.params
+        console.log(id)
+        const loginDetails = await AdminLoginModel.find({ userID: id });
+        
+        return res.status(200).json({
+            message: "Successfully fetch data",
+            data: loginDetails
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error",
+        })
+    }
+
+}
+module.exports = {AdminLogin, LoginDetails};

@@ -130,7 +130,104 @@ exports.GetOwnerCoins = async (req, res) => {
     res.status(500).json({
         message: "internel error", error
     })
-}
+    }
 }
 
+
+exports.getUserById = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const response = await AdminModel.findById(id);
+       
+        if (!response) {
+            const client = await clientModel.findById(id);
+            if (client) {
+                return res.status(200).json({
+                    message: "sucessfully fetch Client data",
+                    data: client,
+                  });
+            } else {
+                return res.status(404).json({
+                    message: "User Not Found",
+                  });
+            }
+              
+        } else {
+          return res.status(200).json({
+            message: "sucessfully fetch Admin data",
+            data: response,
+          });
+        }
+    } catch (error) {
+
+      res.status(500).json({
+        message: "internel error",
+        error,
+      });
+    }
+  };
+
+  exports.updateClientById = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status,reference,matchShare,casinoShare,casinoComm, DoneById } = req.body;
+      const updateData = {};
+      if (status !== undefined) updateData.status = status;
+      if (reference !== undefined) updateData.reference = reference;
+      if (matchShare !== undefined) updateData.matchShare = matchShare;
+      if (casinoShare !== undefined) updateData.casinoShare = casinoShare;
+      if (casinoComm !== undefined) updateData.casinoComm = casinoComm;
+      
+      const updatedAdmin = await AdminModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true } // Return the updated document
+      );
+
+        return res.status(200).json({
+          message: "Successfully updated admin data",
+          data: updatedAdmin,
+        });
+      
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        message: "internel error",
+        error,
+      });
+    }
+  };
+exports.updateUserStatus = async (req, res) => {
+    try {
+        const {id} = req.params
+        const {status} = req.body
+        let response
+        response  = await AdminModel.findByIdAndUpdate(
+            id, {status: status}, {new: true}
+        )
+        if (!response) {
+            response = await clientModel.findByIdAndUpdate(
+                id, {status: status}, {new: true}
+            )
+            return res.status(200).json({
+                message: "sucessfully Update Client",
+                data: response
+            })
+        }
+        if (!response) {
+            res.status(404).json({
+                message: "User not Found",
+            })
+        }
+
+        res.status(200).json({
+            message: "sucessfully Update Admin",
+            data: response
+        })
+   } catch (error) {
+    res.status(500).json({
+        message: "internel error", error
+    })
+}
+}
 
