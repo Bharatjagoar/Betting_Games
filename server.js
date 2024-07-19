@@ -18,6 +18,7 @@ app.use(process.env.ADMIN_ROUTES, require("./app/admin/Ledger/routes/ledger.rout
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/Profile/Profile.routes"))
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/login/Login.routes"))
 app.use(process.env.WEBSITE_ROUTES,require('./app/website/inplay/match.routes'))
+app.use(process.env.WEBSITE_ROUTES,require("./app/website/statements/routes/Statement.routes"));
 
 
 app.get('/', function (req, res) {

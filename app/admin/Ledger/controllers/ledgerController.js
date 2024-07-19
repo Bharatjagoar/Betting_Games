@@ -6,6 +6,7 @@ exports.createLedger = async (req,res)=>{
     // const data = await ledgerModel.find();
     // console.log(data);
     // res.send(data);
+    console.log("hiiii")
 
   } catch (error) {
     res.status(500).json({
