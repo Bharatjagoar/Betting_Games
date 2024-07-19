@@ -3,8 +3,11 @@ const mongoose = require("mongoose");
 const statementSchema = new mongoose.Schema(
   {
     UserId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "client",
+      type: mongoose.ObjectId,
+    },
+    UserType: {
+        type: String,
+        enum: ["client", "admin"],
     },
     Description: {
       type: String,

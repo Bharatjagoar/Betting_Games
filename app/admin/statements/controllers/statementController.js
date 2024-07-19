@@ -1,4 +1,4 @@
-const statementModel = require("../models/statement.model");
+const statementModel = require("../../../website/statements/models/statement.model");
 
 exports.getStatement = async (req, res) => {
   try {
