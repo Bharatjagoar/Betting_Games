@@ -245,7 +245,6 @@ exports.updateUserStatus = async (req, res) => {
 exports.getUserPassword = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
     const Admin = await AdminModel.findById(id);
     if (!Admin) {
     const client  = await clientModel.findById(id);
@@ -263,7 +262,6 @@ exports.getUserPassword = async (req, res) => {
       }
   } else {
       const {Password } = Admin;
-      console.log("Admin pass" ,Password);
       res.status(404).json({
         message:"Success",
         data:Password
@@ -293,7 +291,7 @@ exports.userResetPassword = async (req, res) => {
     if (!Admin) {
       let client = await clientModel.findById(id);
       if (client) {
-        updatedClientPassword = await clientModel.updateOne(
+        updatedClientPassword = await clientModel.findByIdAndUpdate(
           { _id: id },
           { $set: { Password: newPassword } },
           { new: true }
@@ -309,7 +307,7 @@ exports.userResetPassword = async (req, res) => {
         });
       }
     } else {
-      const UpdatedAdminPassword = await AdminModel.updateOne(
+      const UpdatedAdminPassword = await AdminModel.findByIdAndUpdate(
         { _id: id },
         { $set: { Password: newPassword } },
         { new: true }
