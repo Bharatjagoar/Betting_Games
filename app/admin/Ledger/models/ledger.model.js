@@ -17,21 +17,21 @@ const LedgerSchema = new mongoose.Schema(
     lost: {
       type: Number,
     },
-    hisab: {
+    balance: {
       type: Number,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      refPath: "userType",
+      ref: "userType",
     },
     userType: {
       type: String,
       required: true,
       enum: ["client", "Admin"],
-      },
+    },
   },
- { timestamps: true }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Ledger", LedgerSchema);
