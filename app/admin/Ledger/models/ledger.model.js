@@ -21,14 +21,14 @@ const LedgerSchema = new mongoose.Schema(
       type: Number,
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        refPath: "userType",
-      },
-      userType: {
-        type: String,
-        required: true,
-        enum: ["client", "Admin"],
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      refPath: "userType",
+    },
+    userType: {
+      type: String,
+      required: true,
+      enum: ["client", "Admin"],
       },
   },
  { timestamps: true }
