@@ -4,7 +4,7 @@ const {getStatement, getStatementById} = require("../controllers/statementContro
 
 
 router.get("/getStatement", getStatement);
-router.get("/getStatementById/:id", getStatement);
+router.get("/getStatementById/:id", getStatementById);
 
 
 
