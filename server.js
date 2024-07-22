@@ -1,10 +1,13 @@
 const express = require('express')
-const app = express()
+const http = require('http');
 require('dotenv').config()
 const cors = require('cors');
 const connectDB = require('./app/config/DBConfig')
+const app = express();
+const server = http.createServer(app);
 app.use(express.json())
 app.use(cors());
+const setupSocket = require('./Socket/socket');
 const port = process.env.PORT
 
 // Admin
@@ -24,11 +27,17 @@ app.use(process.env.WEBSITE_ROUTES,require('./app/website/inplay/match.routes'))
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/statements/routes/Statement.routes"));
 
 
+
+
+
 app.get('/', function (req, res) {
   res.send('Hello World')
 })
 
-app.listen(port, async () => {
+// Set up Socket.io
+setupSocket(server);
+
+server.listen(port, async () => {
   await connectDB()
   console.log(`http://localhost:${port} server is running`)
 })

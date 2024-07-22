@@ -522,7 +522,6 @@ const dummyledger = [
 exports.UserHeaderDetails = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log(req.params)
         const user = await UserModel.findById(id)
         if (!user) {
             return res.status(404).json({
@@ -548,7 +547,6 @@ exports.UserHeaderDetails = async (req, res) => {
 exports.UserInfo = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log(req.params)
         const user = await UserModel.findById(id)
         if (!user) {
             return res.status(404).json({
