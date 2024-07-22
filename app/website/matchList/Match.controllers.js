@@ -3,7 +3,6 @@ const MatchList = require("./Match.model");
 const CompetitionList = require("./CompetitionsList.model");
 
 const fetchMatch = async () => {
-  let data = [];
   try {
     const competitionConfig = {
       method: "get",
@@ -16,6 +15,20 @@ const fetchMatch = async () => {
     console.log("Competition Data", JSON.stringify(competitionResponse.data, null, 2));
     const competitionData = competitionResponse.data;
 
+    // Store competition data if not exists
+    for (let i = 0; i < competitionData.length; i++) {
+      const competitionItem = competitionData[i];
+      const existingCompetition = await CompetitionList.findOne({ 'event.id': competitionItem.event.id });
+
+      if (!existingCompetition) {
+        const newCompetition = new CompetitionList(competitionItem);
+        await newCompetition.save();
+        console.log(`Competition ${competitionItem.event.name} saved.`);
+      } else {
+        console.log(`Competition ${competitionItem.event.name} already exists.`);
+      }
+    }
+
     // Use Promise.all to handle asynchronous operations within map
     const matchDataPromises = competitionData.map(async (item) => {
       const matchConfig = {
@@ -26,13 +39,29 @@ const fetchMatch = async () => {
       };
       const matchResponse = await axios(matchConfig);
       console.log("Match Data", JSON.stringify(matchResponse.data, null, 2));
-      return matchResponse.data;
+      const matches = matchResponse.data;
+
+      // Store match data if not exists
+      for (let j = 0; j < matches.length; j++) {
+        const matchItem = matches[j];
+        const existingMatch = await MatchList.findOne({ 'event.id': matchItem.event.id });
+
+        if (!existingMatch) {
+          const newMatch = new MatchList(matchItem);
+          await newMatch.save();
+          console.log(`Match ${matchItem.event.name} saved.`);
+        } else {
+          console.log(`Match ${matchItem.event.name} already exists.`);
+        }
+      }
+
+      return matches;
     });
 
-    // Wait for all match data to be fetched
-    data = await Promise.all(matchDataPromises);
+    // Wait for all match data to be fetched and stored
+    const matchData = await Promise.all(matchDataPromises);
 
-    return { competitionData, matchData: data };
+    return { competitionData, matchData };
 
   } catch (error) {
     console.error("Error fetching data:", error.message);
@@ -44,42 +73,10 @@ exports.MatchListData = async (req, res) => {
   try {
     const { competitionData, matchData } = await fetchMatch();
 
-    // Store competition data if not exists
-    // for (let i = 0; i < competitionData.length; i++) {
-    //   const competitionItem = competitionData[i];
-    //   const existingCompetition = await CompetitionList.findOne({ 'event.id': competitionItem.event.id });
-
-    //   if (!existingCompetition) {
-    //     const newCompetition = new CompetitionList(competitionItem);
-    //     await newCompetition.save();
-    //     console.log(`Competition ${competitionItem.event.name} saved.`);
-    //   } else {
-    //     console.log(`Competition ${competitionItem.event.name} already exists.`);
-    //   }
-    // }
-
-    // Store match data if not exists
-    // for (let i = 0; i < matchData.length; i++) {
-    //   const matches = matchData[i];
-    //   for (let j = 0; j < matches.length; j++) {
-    //     const matchItem = matches[j];
-    //     const existingMatch = await MatchList.findOne({ 'event.id': matchItem.event.id });
-
-    //     if (!existingMatch) {
-    //       const newMatch = new MatchList(matchItem);
-    //       await newMatch.save();
-    //       console.log(`Match ${matchItem.event.name} saved.`);
-    //     } else {
-    //       console.log(`Match ${matchItem.event.name} already exists.`);
-    //     }
-    //   }
-    // }
-
     res.status(200).json({
       code: 200,
       message: "Successfully fetched match list",
-      data: competitionData, 
-      match: matchData
+      data: { competitionData, matchData },
     });
   } catch (error) {
     console.log(error.message);
