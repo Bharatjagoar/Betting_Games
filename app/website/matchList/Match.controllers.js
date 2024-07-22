@@ -71,7 +71,7 @@ const fetchMatch = async () => {
 
 exports.MatchListData = async (req, res) => {
   try {
-    // const { competitionData, matchData } = await fetchMatch();
+    const { competitionData, matchData } = await fetchMatch();
 
     // Get today's date in UTC
     const todayStart = new Date();
