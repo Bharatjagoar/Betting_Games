@@ -1,5 +1,6 @@
 const axios = require("axios");
 const MatchList = require("./Match.model");
+const CompetitionList = require("./CompetitionsList.model");
 
 const fetchMatch = async () => {
   let data = [];
@@ -24,14 +25,14 @@ const fetchMatch = async () => {
         headers: {},
       };
       const matchResponse = await axios(matchConfig);
-      console.log("Match Data", JSON.stringify("match data",matchResponse.data, null, 2));
+      console.log("Match Data", JSON.stringify(matchResponse.data, null, 2));
       return matchResponse.data;
     });
 
     // Wait for all match data to be fetched
     data = await Promise.all(matchDataPromises);
 
-    return data;
+    return { competitionData, matchData: data };
 
   } catch (error) {
     console.error("Error fetching data:", error.message);
@@ -41,13 +42,44 @@ const fetchMatch = async () => {
 
 exports.MatchListData = async (req, res) => {
   try {
-    const result = await fetchMatch();
+    const { competitionData, matchData } = await fetchMatch();
 
-    const data = await MatchList.find();
+    // Store competition data if not exists
+    // for (let i = 0; i < competitionData.length; i++) {
+    //   const competitionItem = competitionData[i];
+    //   const existingCompetition = await CompetitionList.findOne({ 'event.id': competitionItem.event.id });
+
+    //   if (!existingCompetition) {
+    //     const newCompetition = new CompetitionList(competitionItem);
+    //     await newCompetition.save();
+    //     console.log(`Competition ${competitionItem.event.name} saved.`);
+    //   } else {
+    //     console.log(`Competition ${competitionItem.event.name} already exists.`);
+    //   }
+    // }
+
+    // Store match data if not exists
+    // for (let i = 0; i < matchData.length; i++) {
+    //   const matches = matchData[i];
+    //   for (let j = 0; j < matches.length; j++) {
+    //     const matchItem = matches[j];
+    //     const existingMatch = await MatchList.findOne({ 'event.id': matchItem.event.id });
+
+    //     if (!existingMatch) {
+    //       const newMatch = new MatchList(matchItem);
+    //       await newMatch.save();
+    //       console.log(`Match ${matchItem.event.name} saved.`);
+    //     } else {
+    //       console.log(`Match ${matchItem.event.name} already exists.`);
+    //     }
+    //   }
+    // }
+
     res.status(200).json({
       code: 200,
       message: "Successfully fetched match list",
-      data: result,
+      data: competitionData, 
+      match: matchData
     });
   } catch (error) {
     console.log(error.message);

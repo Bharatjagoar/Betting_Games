@@ -24,5 +24,5 @@ const dataSchema = new mongoose.Schema({
 });
 
 // Create and export the model
-const MatchList = mongoose.model('CompetitionList', dataSchema);
-module.exports = MatchList;
+const CompetitionList = mongoose.model('CompetitionList', dataSchema);
+module.exports = CompetitionList;
