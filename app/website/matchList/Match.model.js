@@ -17,7 +17,7 @@ const dataSchema = new mongoose.Schema({
       type: String,
     },
     openDate: {
-      type: Date,
+      type: String,
       required: true,
     },
   },

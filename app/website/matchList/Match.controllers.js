@@ -71,16 +71,36 @@ const fetchMatch = async () => {
 
 exports.MatchListData = async (req, res) => {
   try {
-    const { competitionData, matchData } = await fetchMatch();
+    // const { competitionData, matchData } = await fetchMatch();
 
-    res.status(200).json({
+    // Get today's date in UTC
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0); // Start of today
+
+    const todayEnd = new Date(todayStart);
+    todayEnd.setUTCHours(23, 59, 59, 999); // End of today
+
+    console.log("Today's start:", todayStart.toISOString());
+    console.log("Today's end:", todayEnd.toISOString());
+
+    // Query the database for matches with today's open date
+    const todayMatches = await MatchList.find({
+      'event.openDate.$date': {
+        $gte: todayStart,
+        $lt: todayEnd
+      }
+    });
+
+    console.log("Matches found:", todayMatches);
+
+    return res.status(200).json({
       code: 200,
       message: "Successfully fetched match list",
-      data: { competitionData, matchData },
+      data: todayMatches
     });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       code: 500,
       message: error.message,
     });
