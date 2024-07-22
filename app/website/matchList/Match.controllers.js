@@ -18,14 +18,14 @@ const fetchMatch = async () => {
     // Store competition data if not exists
     for (let i = 0; i < competitionData.length; i++) {
       const competitionItem = competitionData[i];
-      const existingCompetition = await CompetitionList.findOne({ 'event.id': competitionItem.event.id });
+      const existingCompetition = await CompetitionList.findOne({ 'competition.id': competitionItem.competition.id });
 
       if (!existingCompetition) {
         const newCompetition = new CompetitionList(competitionItem);
         await newCompetition.save();
-        console.log(`Competition ${competitionItem.event.name} saved.`);
+        console.log(`Competition ${competitionItem.competition.name} saved.`);
       } else {
-        console.log(`Competition ${competitionItem.event.name} already exists.`);
+        console.log(`Competition ${competitionItem.competition.name} already exists.`);
       }
     }
 
