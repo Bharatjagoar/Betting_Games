@@ -25,6 +25,7 @@ app.use(process.env.WEBSITE_ROUTES,require("./app/website/Profile/Profile.routes
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/login/Login.routes"))
 app.use(process.env.WEBSITE_ROUTES,require('./app/website/inplay/match.routes'))
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/statements/routes/Statement.routes"));
+app.use(process.env.WEBSITE_ROUTES,require("./app/website/matchList/Match.routes"));
 
 
 
