@@ -12,20 +12,27 @@ const fetchMatch = async () => {
     };
 
     const competitionResponse = await axios(competitionConfig);
-    console.log("Competition Data", JSON.stringify(competitionResponse.data, null, 2));
+    console.log(
+      "Competition Data",
+      JSON.stringify(competitionResponse.data, null, 2)
+    );
     const competitionData = competitionResponse.data;
 
     // Store competition data if not exists
     for (let i = 0; i < competitionData.length; i++) {
       const competitionItem = competitionData[i];
-      const existingCompetition = await CompetitionList.findOne({ 'competition.id': competitionItem.competition.id });
+      const existingCompetition = await CompetitionList.findOne({
+        "competition.id": competitionItem.competition.id,
+      });
 
       if (!existingCompetition) {
         const newCompetition = new CompetitionList(competitionItem);
         await newCompetition.save();
         console.log(`Competition ${competitionItem.competition.name} saved.`);
       } else {
-        console.log(`Competition ${competitionItem.competition.name} already exists.`);
+        console.log(
+          `Competition ${competitionItem.competition.name} already exists.`
+        );
       }
     }
 
@@ -44,7 +51,9 @@ const fetchMatch = async () => {
       // Store match data if not exists
       for (let j = 0; j < matches.length; j++) {
         const matchItem = matches[j];
-        const existingMatch = await MatchList.findOne({ 'event.id': matchItem.event.id });
+        const existingMatch = await MatchList.findOne({
+          "event.id": matchItem.event.id,
+        });
 
         if (!existingMatch) {
           const newMatch = new MatchList(matchItem);
@@ -62,7 +71,6 @@ const fetchMatch = async () => {
     const matchData = await Promise.all(matchDataPromises);
 
     return { competitionData, matchData };
-
   } catch (error) {
     console.error("Error fetching data:", error.message);
     throw error;
@@ -71,32 +79,73 @@ const fetchMatch = async () => {
 
 exports.MatchListData = async (req, res) => {
   try {
-    const { competitionData, matchData } = await fetchMatch();
+    const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(today.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+    };
+    // const { competitionData, matchData } = await fetchMatch();
 
-    // Get today's date in UTC
-    const todayStart = new Date();
-    todayStart.setUTCHours(0, 0, 0, 0); // Start of today
+    const specificDate = getTodayDate();
+    const regexPattern = `^${specificDate}`; // Matches any date string starting with '2024-07-23'
 
-    const todayEnd = new Date(todayStart);
-    todayEnd.setUTCHours(23, 59, 59, 999); // End of today
-
-    console.log("Today's start:", todayStart.toISOString());
-    console.log("Today's end:", todayEnd.toISOString());
-
-    // Query the database for matches with today's open date
-    const todayMatches = await MatchList.find({
-      'event.openDate.$date': {
-        $gte: todayStart,
-        $lt: todayEnd
+    const matchesOnSpecificDate = await MatchList.aggregate([
+      {
+        $match: {
+          "event.openDate": {
+            $regex: regexPattern,
+          },
+        },
+      },
+      {
+        $addFields: {
+          // Convert openDate from string to Date
+          openDateAsDate: {
+            $dateFromString: {
+              dateString: "$event.openDate",
+              // Remove timezone to avoid conflicts
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          "TeamA": {
+            $arrayElemAt: [{ $split: ["$event.name", " v "] }, 0],
+          },
+          "TeamB": {
+            $arrayElemAt: [{ $split: ["$event.name", " v "] }, 1],
+          },
+          openDate: "$event.openDate",
+          openDateAsDate: 1,
+          MatchId: "$event.id",
+          marketCount: 1,
+          scoreboard_id: 1,
+          selections: 1,
+          liability_type: 1,
+          undeclared_markets: 1,
+        },
+      },
+      {
+        $sort: { openDateAsDate: 1 } // Sort by the converted date in descending order (latest first)
       }
-    });
+    ]);
+    // const matchesOnSpecificDate = await MatchList.find({
+    //   'event.openDate': {
+    //     $regex: `^${specificDate}`
+    //   }
+    // });
 
-    console.log("Matches found:", todayMatches);
+    console.log("Matches found:", matchesOnSpecificDate);
 
     return res.status(200).json({
       code: 200,
       message: "Successfully fetched match list",
-      data: todayMatches
+      data: matchesOnSpecificDate,
     });
   } catch (error) {
     console.log(error.message);
