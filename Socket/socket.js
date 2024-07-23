@@ -28,9 +28,9 @@ const updateSessionOdds = async (io, matchId, marketId) => {
       headers: {},
     };
 
-    // const Oddsdata = await axios(Oddsconfig);
-    // const MatchOdds = Oddsdata.data;
-    const MatchOdds = "bhgvhg";
+    const Oddsdata = await axios(Oddsconfig);
+    const MatchOdds = Oddsdata.data;
+    // const MatchOdds = "bhgvhg";
 
     // console.log(JSON.stringify(fetchedData));
 
