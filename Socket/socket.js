@@ -1,7 +1,7 @@
 var axios = require("axios");
 const socketIo = require("socket.io");
 
-const scorecboard = {
+const scorecboarddummy = {
     "message": "Match score fetched.",
     "code": 0,
     "error": false,
@@ -183,7 +183,7 @@ const updateSessionOdds = async (io, matchId, marketId) => {
     
 
     // Emit updated data
-    io.emit("receiveData", {fetchedData,MatchOdds,scorecboard});
+    io.emit("receiveData", {fetchedData,MatchOdds,scorecboarddummy});
   } catch (error) {
     console.error("Error updating session odds:", error.message);
   }
