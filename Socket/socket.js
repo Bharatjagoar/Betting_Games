@@ -44,7 +44,7 @@ let session_odds = [
 // Function to generate random number between 0 and 100
 const generateRandomNumber = () => Math.floor(Math.random() * 101);
 
-const updateSessionOdds = async (io, matchId) => {
+const updateSessionOdds = async (io, matchId, marketId) => {
   try {
     var config = {
       method: "get",
@@ -57,46 +57,26 @@ const updateSessionOdds = async (io, matchId) => {
     const fetchedData = response.data;
 
     console.log(JSON.stringify(fetchedData));
-    // Update session odds
-    //   session_odds = session_odds.map(odds => ({
-    //     ...odds,
-    //     back_condition: generateRandomNumber(),
-    //     back: generateRandomNumber(),
-    //     lay_condition: generateRandomNumber(),
-    //     lay: generateRandomNumber()
-    //   }));
+    
+    var Oddsconfig = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: `http://142.93.36.1/api/v2/getMarketsOdds?EventTypeID=4&marketId=${marketId}`,
+      headers: {},
+    };
+
+    const Oddsdata = await axios(Oddsconfig);
+    const MatchOdds = Oddsdata.data;
+
+    console.log(JSON.stringify(fetchedData));
+
 
     // Emit updated data
-    io.emit("receiveData", fetchedData);
+    io.emit("receiveData", {fetchedData,MatchOdds});
   } catch (error) {
     console.error("Error updating session odds:", error.message);
   }
 };
-
-// Function to update session odds with random values
-// const updateSessionOdds = (io) => {
-//     session_odds = session_odds.map(odds => ({
-//         ...odds,
-//         back_condition: generateRandomNumber(),
-//         back: generateRandomNumber(),
-//         lay_condition: generateRandomNumber(),
-//         lay: generateRandomNumber()
-//     }));
-//     io.emit('receiveData', session_odds);
-// };
-
-// Function to reset session odds to zero
-// const resetSessionOddsToZero = (io) => {
-
-//     session_odds = session_odds.map(odds => ({
-//         ...odds,
-//         back_condition: 0,
-//         back: 0,
-//         lay_condition: 0,
-//         lay: 0
-//     }));
-//     io.emit('receiveData', session_odds);
-// };
 
 const UserProfile = (io) => {
   const userProfile = {
@@ -119,24 +99,16 @@ const setupSocket = (server) => {
   io.on("connection", (socket) => {
     console.log("A user connected", socket.id);
     const matcbId = 33433287;
-    // Set up intervals for updating and resetting odds
+    const marketId = 1.230919732;
     const updateInterval = setInterval(
-      () => updateSessionOdds(io, matcbId),
+      () => updateSessionOdds(io, matcbId,marketId),
       1000
-    ); // Update every 8 seconds
-    // const resetInterval = setInterval(() => resetSessionOddsToZero(io), 10000); // Reset every 10 seconds
-
+    ); 
     socket.on("UserId", (data) => {
-      console.log(data);
-      console.log(socket.id);
-
       setInterval(() => UserProfile(io), 1000); // Update every 8 seconds
     });
 
-    // Handle incoming data and broadcast it
-    // socket.on('sendData', (data) => {
-    //     io.emit('receiveData', data);
-    // });
+   
 
     socket.on("disconnect", () => {
       console.log("A user disconnected");
