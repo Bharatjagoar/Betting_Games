@@ -118,7 +118,7 @@ const setupSocket = (server) => {
 
   io.on("connection", (socket) => {
     console.log("A user connected", socket.id);
-    const matcbId = 33433286;
+    const matcbId = 33433287;
     // Set up intervals for updating and resetting odds
     const updateInterval = setInterval(
       () => updateSessionOdds(io, matcbId),
