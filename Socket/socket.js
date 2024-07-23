@@ -30,12 +30,13 @@ const updateSessionOdds = async (io, matchId, marketId) => {
 
     // const Oddsdata = await axios(Oddsconfig);
     // const MatchOdds = Oddsdata.data;
+    const MatchOdds = "bhgvhg";
 
     // console.log(JSON.stringify(fetchedData));
 
 
     // Emit updated data
-    io.emit("receiveData", {fetchedData});
+    io.emit("receiveData", {fetchedData,MatchOdds});
   } catch (error) {
     console.error("Error updating session odds:", error.message);
   }
