@@ -18,8 +18,6 @@ const updateSessionOdds = async (io, matchId, marketId) => {
       item.gtype = "session";
       return item;
     });
-
-    console.log(JSON.stringify(fetchedData));
     
     var Oddsconfig = {
       method: "get",
@@ -30,13 +28,21 @@ const updateSessionOdds = async (io, matchId, marketId) => {
 
     const Oddsdata = await axios(Oddsconfig);
     const MatchOdds = Oddsdata.data;
-    // const MatchOdds = "bhgvhg";
 
-    // console.log(JSON.stringify(fetchedData));
 
+    var scoreconfig = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: `http://142.93.36.1/api/v2/score?EventTypeID=4&matchId==${matchId}`,
+      headers: {},
+    };
+
+    const scorecboard = await axios(scoreconfig);
+    const scorecboardData = scorecboard.data;
+    
 
     // Emit updated data
-    io.emit("receiveData", {fetchedData,MatchOdds});
+    io.emit("receiveData", {fetchedData,MatchOdds,scorecboardData});
   } catch (error) {
     console.error("Error updating session odds:", error.message);
   }
