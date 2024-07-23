@@ -67,7 +67,7 @@ const updateSessionOdds = async (io, matchId) => {
     //   }));
 
     // Emit updated data
-    io.emit("receiveData", JSON.stringify(fetchedData));
+    io.emit("receiveData", fetchedData);
   } catch (error) {
     console.error("Error updating session odds:", error.message);
   }
