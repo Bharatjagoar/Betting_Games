@@ -54,7 +54,12 @@ const updateSessionOdds = async (io, matchId, marketId) => {
     };
 
     const response = await axios(config);
-    const fetchedData = response.data;
+    const fetchedDataAPI = response.data;
+
+    const fetchedData = fetchedDataAPI.map((item) => {
+      item.gtype = "session";
+      return item;
+    });
 
     console.log(JSON.stringify(fetchedData));
     
