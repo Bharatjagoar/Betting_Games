@@ -33,7 +33,9 @@ const updateSessionOdds = async (io, matchId, marketId) => {
     var scoreconfig = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `http://142.93.36.1/api/v2/score?EventTypeID=4&matchId==${matchId}`,
+      // url: `http://142.93.36.1/api/v2/score?EventTypeID=4&matchId=${matchId}`,
+      url: `http://142.93.36.1/api/v2/score?EventTypeID=4&matchId=33418377`,
+      
       headers: {},
     };
 
