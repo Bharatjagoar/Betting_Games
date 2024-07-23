@@ -1,48 +1,6 @@
 var axios = require("axios");
 const socketIo = require("socket.io");
 
-// Initial sample data
-let session_odds = [
-  {
-    team_batting: "0",
-    title: "1st Inn 0 to 20 overs Total Sixes PBKS adv",
-    back_condition: "118",
-    back: "100",
-    lay_condition: "6",
-    lay: "100",
-    status: "",
-  },
-  {
-    team_batting: "0",
-    title: "1st Inn 0 to 20 overs Total Fours PBKS adv",
-    back_condition: "16",
-    back: "100",
-    lay_condition: "14",
-    lay: "100",
-    status: "",
-  },
-  {
-    team_batting: "0",
-    title: "1st Inn 0 to 20 overs Total 2 runs PBKS adv",
-    back_condition: "11",
-    back: "100",
-    lay_condition: "9",
-    lay: "100",
-    status: "",
-  },
-  {
-    team_batting: "0",
-    title: "1st Inn 0 to 20 overs Total 1 runs PBKS adv",
-    back_condition: "49",
-    back: "100",
-    lay_condition: "47",
-    lay: "100",
-    status: "",
-  },
-];
-
-// Function to generate random number between 0 and 100
-const generateRandomNumber = () => Math.floor(Math.random() * 101);
 
 const updateSessionOdds = async (io, matchId, marketId) => {
   try {
@@ -56,7 +14,10 @@ const updateSessionOdds = async (io, matchId, marketId) => {
     const response = await axios(config);
     const fetchedDataAPI = response.data;
 
-    const fetchedData = fetchedDataAPI.filter(item => item.gtype === "session");
+    const fetchedData = fetchedDataAPI.map((item) => {
+      item.gtype = "session";
+      return item;
+    });
 
     console.log(JSON.stringify(fetchedData));
     
@@ -67,14 +28,14 @@ const updateSessionOdds = async (io, matchId, marketId) => {
       headers: {},
     };
 
-    const Oddsdata = await axios(Oddsconfig);
-    const MatchOdds = Oddsdata.data;
+    // const Oddsdata = await axios(Oddsconfig);
+    // const MatchOdds = Oddsdata.data;
 
-    console.log(JSON.stringify(fetchedData));
+    // console.log(JSON.stringify(fetchedData));
 
 
     // Emit updated data
-    io.emit("receiveData", {fetchedData,MatchOdds});
+    io.emit("receiveData", {fetchedData});
   } catch (error) {
     console.error("Error updating session odds:", error.message);
   }
