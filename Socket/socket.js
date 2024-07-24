@@ -183,7 +183,7 @@ const updateSessionOdds = async (io, matchId, marketId) => {
     
 
     // Emit updated data
-    io.emit("receiveData", {fetchedData,MatchOdds,scorecboarddummy});
+    io.emit("receiveData", {fetchedData,MatchOdds,scorecboardData});
   } catch (error) {
     console.error("Error updating session odds:", error.message);
   }
