@@ -79,13 +79,14 @@ const fetchMatch = async () => {
 
 exports.MatchListData = async (req, res) => {
   try {
+    fetchMatch()
     const getTodayDate = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-    const day = String(today.getDate()).padStart(2, '0');
-    
-    return `${year}-${month}-${day}`;
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+      const day = String(today.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
     };
     // const { competitionData, matchData } = await fetchMatch();
 
@@ -107,17 +108,17 @@ exports.MatchListData = async (req, res) => {
             $dateFromString: {
               dateString: "$event.openDate",
               // Remove timezone to avoid conflicts
-            }
-          }
-        }
+            },
+          },
+        },
       },
       {
         $project: {
           _id: 1,
-          "TeamA": {
+          TeamA: {
             $arrayElemAt: [{ $split: ["$event.name", " v "] }, 0],
           },
-          "TeamB": {
+          TeamB: {
             $arrayElemAt: [{ $split: ["$event.name", " v "] }, 1],
           },
           openDate: "$event.openDate",
@@ -131,8 +132,8 @@ exports.MatchListData = async (req, res) => {
         },
       },
       {
-        $sort: { openDateAsDate: 1 } // Sort by the converted date in descending order (latest first)
-      }
+        $sort: { openDateAsDate: 1 }, // Sort by the converted date in descending order (latest first)
+      },
     ]);
     // const matchesOnSpecificDate = await MatchList.find({
     //   'event.openDate': {
