@@ -15,4 +15,7 @@ const ludoUserSchema = new mongoose.Schema({
             default:0
         }
     }
-})
+},{timestamps:true})
+
+const ludouserSchema = mongoose.model('ludouserSchema', ludoUserSchema);
+module.exports = ludouserSchema;
