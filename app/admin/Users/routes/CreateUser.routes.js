@@ -1,5 +1,5 @@
 const express = require('express')
-const {AddUser,GetUser, CreateClient, GetOwnerCoins, getUserListByRole, GetClient, updateUserStatus,getUserById, updateClientById,userResetPassword,getUserPassword } = require('../controllers/CreateUser.controllers')
+const {AddUser,GetUser, CreateClient, GetOwnerCoins, getUserListByRole, GetClient, updateUserStatus,getUserById, updateClientById,userResetPassword,getUserPassword, checkUserAuth } = require('../controllers/CreateUser.controllers')
 
 const router = express.Router()
 
@@ -19,6 +19,10 @@ router.put("/updateClient/:id",updateClientById);
 
 router.get("/getPassword/:id",getUserPassword)
 router.put("/forgotPassword/:id", userResetPassword)
+
+
+
+router.get("/checkAuth",checkUserAuth)
 
 
 module.exports = router

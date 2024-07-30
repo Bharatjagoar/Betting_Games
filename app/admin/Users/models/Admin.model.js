@@ -41,7 +41,7 @@ const Adminschema = new mongoose.Schema({
         required: true,
     },
     creatorId: {
-        type: mongoose.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Admin',
     },
     mobile: {
@@ -52,7 +52,10 @@ const Adminschema = new mongoose.Schema({
     },
     otp: {
         type: Number
-    }, 
+    },
+    lineupDetails: {
+        type: Object,
+      }
 }, {
     timestamps: true
 });
