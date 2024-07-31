@@ -25,6 +25,14 @@ const ludoMatchschema = new mongoose.Schema({
             yellow:{type:[Number]},
             green:{type:[Number]}
         }
+    },
+    WinOrLoose:{
+        type:Boolean,
+        required:true
+    },
+    
+    tableCategory:{
+        type:String
     }
     
 },{timestamps:true});
