@@ -20,10 +20,20 @@ const ludoMatchschema = new mongoose.Schema({
         type:Object,
         required:true,
         properties:{
-            red:{type:[Number]},
-            blue:{type:[Number]},
-            yellow:{type:[Number]},
-            green:{type:[Number]}
+            red:{type:[Number],default:[0,0,0,0]},
+            blue:{type:[Number],default:[0,0,0,0]},
+            yellow:{type:[Number],default:[0,0,0,0]},
+            green:{type:[Number],default:[0,0,0,0]}
+        }
+    },
+    numberOfmoves:{
+        type:Object,
+        required:true,
+        properties:{
+            red:{type:Number,default:0},
+            green:{type:Number,default:0},
+            blue:{type:Number,default:0},
+            yellow:{type:Number,default:0}
         }
     },
     WinOrLoose:{

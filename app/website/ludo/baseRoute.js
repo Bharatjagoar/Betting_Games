@@ -15,6 +15,7 @@ router.get("/LudoResult",ludoUserContoller.ResultDeclare)
 router.get("/SetCategoryPrediciton",ludoUserContoller.SetCategoryPrediciton)
 router.get("/test",ludoUserContoller.Testmatch)
 router.get("/matchStart",ludoUserContoller.matchStart)
+router.get("/fetchingPosition",ludoUserContoller.fetchingPosition)
 
 
 

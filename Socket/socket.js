@@ -100,6 +100,6 @@ const setupSocket = (server) => {
   });
 
   return io;
-};
+  };
 
 module.exports = setupSocket;

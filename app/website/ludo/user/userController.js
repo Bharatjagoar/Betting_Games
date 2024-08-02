@@ -86,31 +86,42 @@ module.exports.matchStart = async (req,res)=>{
     res.send(reset)
 }
 module.exports.Movement=async (req,res)=>{
+    // task here is to generate the move and also 
+    // udpate the movement in backend 
     console.log(req.body)
     try {
         const {player,numberOfMoves} = req.body
-        const match = await matchDB.findById(req.body.matchId)    
+        const match = await matchDB.findById(req.body.matchId)
+        const findQuery = {}
+        let updateQuery = `playerPosition.${req.body.color}.${req.body.peice}`
+        
         console.log(match)
         let predict = match.WinOrLoose
         let move
         if(player && !predict){
-            move = Math.floor(Math.random() * (4 - 1 + 1)) + 1;
-        }
-        else if(player && predict){
-            if(numberOfMoves>2){
-                move = Math.floor(Math.random() * (6 - 1 + 1)) + 1;
+            if(numberOfMoves%9==0){
+                move=6
             }else{
-                move = Math.floor(Math.random() * (6 - 4 + 1)) + 4;
+                move = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
             }
         }
+        else if(player && predict){
+            move = Math.floor(Math.random() * (6 - 4 + 1)) + 4;
+        }
         else if(!player && !predict){
-            move = Math.floor(Math.random() * (6 - 3 + 1)) + 3;
+            move = Math.floor(Math.random() * (6 - 2 + 1)) + 2;
         }
         else if(!player && predict){
             move = Math.floor(Math.random() * (4 - 1 + 1)) + 1;
         }
+        
         console.log(move,player,numberOfMoves,"99999999999999999999999")
-        res.send({move})
+        findQuery[updateQuery] = req.body.piecePosistion+move
+        const result = await matchDB.findByIdAndUpdate(
+            req.body.matchId,
+            {$set:findQuery},
+            {new:true})
+        res.send({move,result})
     } catch (error) {
         console.log("err",error)
         res.send(error)
@@ -120,6 +131,7 @@ module.exports.Movement=async (req,res)=>{
 
 
 module.exports.createLudouser = async (req,res)=>{
+    
     try {
         const createduser = await userDB.create(req.body)
         console.log(createduser)
@@ -174,4 +186,24 @@ module.exports.SetCategoryPrediciton = async (req,res)=>{
 
 module.exports.setMatchPrediction = async ( req,res )=>{
     res.send("from match prediction")
+}
+
+
+module.exports.fetchingPosition = async (req,res)=>{
+    console.log("fetch")
+    try {
+        const {color,pos,number} = req.body
+        let updateField = `playerPosition.${color}.${pos}`;
+        update={}
+        update[updateField]=number
+        console.log(update)
+        const result = await matchDB.findByIdAndUpdate("66aa029c9989fe38262039a9",
+            {$set:update}
+        )
+        console.log(result)
+        res.send("fetched")
+    } catch (error){
+        console.log("error ",error)
+        res.send(error)
+    }
 }
