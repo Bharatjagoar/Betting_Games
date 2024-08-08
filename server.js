@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 app.use(express.json())
 app.use(cors());
-const setupSocket = require('./Socket/socket');
+const {setupSocket} = require('./Socket/socket');
 const port = process.env.PORT
 
 // Admin
@@ -27,6 +27,7 @@ app.use(process.env.WEBSITE_ROUTES,require('./app/website/inplay/match.routes'))
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/statements/routes/Statement.routes"));
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/matchList/Match.routes"));
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/ludo/baseRoute"));
+app.use(process.env.WEBSITE_ROUTES,require("./app/website/RolletGame/BaseRoute"));
 
 
 

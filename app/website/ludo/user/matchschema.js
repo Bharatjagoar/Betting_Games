@@ -1,52 +1,33 @@
 const mongoose = require('mongoose');
 
-// Define the main schema with the nested event object
-const ludoMatchschema = new mongoose.Schema({
-    player:{
-            blue:{
-                id:{type:mongoose.Schema.Types.ObjectId},
-            },
-            green:{
-                id:{type:mongoose.Schema.Types.ObjectId},
-            },
-            yellow:{
-                id:{type:mongoose.Schema.Types.ObjectId},
-            },
-            red:{
-                id:{type:mongoose.Schema.Types.ObjectId},
-            }
-        },
-    playerPosition:{
-        type:Object,
-        required:true,
-        properties:{
-            red:{type:[Number],default:[0,0,0,0]},
-            blue:{type:[Number],default:[0,0,0,0]},
-            yellow:{type:[Number],default:[0,0,0,0]},
-            green:{type:[Number],default:[0,0,0,0]}
-        }
+const ludoMatchSchema = new mongoose.Schema({
+    player: {
+        blue: { id: { type: mongoose.Schema.Types.ObjectId, default: null } },
+        green: { id: { type: mongoose.Schema.Types.ObjectId, default: null } },
+        yellow: { id: { type: mongoose.Schema.Types.ObjectId, default: null } },
+        red: { id: { type: mongoose.Schema.Types.ObjectId, default: null } }
     },
-    numberOfmoves:{
-        type:Object,
-        required:true,
-        properties:{
-            red:{type:Number,default:0},
-            green:{type:Number,default:0},
-            blue:{type:Number,default:0},
-            yellow:{type:Number,default:0}
-        }
+    playerPosition: {
+        type: Object,
+        default: {}
     },
-    WinOrLoose:{
-        type:Boolean,
-        required:true
+    numberOfMoves: {
+        type: Object,
+        default: {}
     },
-    
-    tableCategory:{
-        type:String
+    WinOrLoose: {
+        type: Boolean,
+        default: false
+    },
+    tableCategory: {
+        type: String,
+        required: true
+    },
+    computerPlayer: {
+        id: { type: mongoose.Schema.Types.ObjectId, default: null },
+        color: { type: String, enum: ['blue', 'green', 'yellow', 'red'], default: null }
     }
-    
-},{timestamps:true});
+}, { timestamps: true });
 
-// Create and export the model
-const ludoMatchschemaList = mongoose.model('LudoMatchList', ludoMatchschema);
-module.exports = ludoMatchschemaList;
+const ludoMatchSchemaList = mongoose.model('LudoMatchList', ludoMatchSchema);
+module.exports = ludoMatchSchemaList;

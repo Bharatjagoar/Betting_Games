@@ -1,75 +1,179 @@
 const matchDB = require("./matchschema")
 const userDB = require("./UserSchema")
+const mongoose = require("mongoose")
 const {ludoMatchTableList} = require("./ludoMatchTable")
 
 
 
 
-function generateRandomArray(start, end, item) {
-    const range = end - start + 1;
-    return Array.from({ length: item }, () => Math.floor(Math.random() * range) + start);
-  }
-
-module.exports.First = async (req,res)=>{
-    console.log("from get ludo ")
-    
-    res.send("from 1 ")
-}
-
-
-module.exports.createMatch = async (req,res)=>{
+module.exports.GameSignin = async (req,res)=>{
+    console.log("hello world")
     console.log(req.body)
+    let updateQuery = {}
+    let propertyName = `${req.body.matchType}`
+    console.log(propertyName)
+    updateQuery[propertyName]=req.body.userId
     try {
-        const created = await matchDB.create(req.body)
-        console.log(created.id)
-        let tableCategory = created.tableCategory
-        let updateQuery = {};
-        updateQuery[tableCategory]=created.id
-        // const updateQuery ={$push:{req.body.tableCategory:created.id}}}
-        const windows = await ludoMatchTableList.findOneAndUpdate(
-            {},
-            {$push:updateQuery},
-            {new:true}
-        )
-        let lenght = windows[`${tableCategory}`].length
-        let start = 0
-        const number=49
-        let stop = windows[`${tableCategory}`].length
-        const sixty = Math.round(stop*0.6)
-        const foty = Math.round(stop*0.4)
-        console.log(sixty,foty)
-        let item=6
-
-        const arr = generateRandomArray(0,stop,sixty) 
-
-        const arroffilteredIds = arr.map(index=>windows[`${tableCategory}`][index])
-        console.log(arroffilteredIds)
-        const setTheWinnigMatches = await matchDB.updateMany(
-            {_id:{$in:arroffilteredIds}},
-            {$set:{WinOrLoose:true}}
-        )
-        console.log(setTheWinnigMatches)
-        const setTheLoosingMatches = await matchDB.updateMany(
-            {_id:{$nin:arroffilteredIds}},
-            {$set:{WinOrLoose:false}}
-        )
-        console.log(setTheLoosingMatches)
-        
-        
-        res.send(windows)
-    } catch (error) {
+        const updateDOC = await ludoMatchTableList.updateOne({},{$push:updateQuery},{new:true})
+        console.log(updateDOC)
+        res.send(updateDOC)
+    } catch (error){
         console.log(error)
         res.send(error)
     }
 }
 
 
+
+
+function generateUniqueRandomArray(start, end, item) {
+    const range = end - start + 1;
+    if (item > range) {
+      throw new Error('Item count cannot be greater than range');
+    }
+  
+    const numbers = [];
+    while (numbers.length < item) {
+      const randomNum = Math.floor(Math.random() * range) + start;
+      if (!numbers.includes(randomNum)) {
+        numbers.push(randomNum);
+      }
+    }
+    return numbers;
+}
+
+function genarr(number){
+    const sixty = Math.round(number * 0.6);
+    let arr = generateUniqueRandomArray(0, number - 1, sixty);
+    console.log(number,arr)
+    return arr;
+}
+
+function generateComputerId() {
+    return new mongoose.Types.ObjectId();
+}
+
+function generateMatch(players, category) {
+    const colors = ["green", "blue", "red", "yellow"];
+    let matches = [];
+    let playerIndex = 0;
+    if(players.length<1)
+        return null
+    // Generate winning indices
+    const winningIndices = genarr(Math.ceil(players.length / 3));
+
+    while (playerIndex < players.length) {
+        let match = {
+            player: {},
+            playerPosition: {},
+            numberOfMoves: {},
+            WinOrLoose: false,
+            tableCategory: category,
+            computerPlayer: { id: null, color: null }
+        };
+
+        let availableColors = [...colors];
+        let computerAdded = false;
+
+        // Add manual players
+        while (playerIndex < players.length && availableColors.length > 1) {
+            let color = availableColors.shift();
+            match.player[color] = { id: players[playerIndex] };
+            match.playerPosition[color] = [0, 0, 0, 0];
+            match.numberOfMoves[color] = 0;
+            playerIndex++;
+        }
+
+        // Ensure at least one computer player
+        if (!computerAdded) {
+            let computerColor = availableColors.shift();
+            let computerId = generateComputerId();
+            match.player[computerColor] = { id: computerId };
+            match.playerPosition[computerColor] = [0, 0, 0, 0];
+            match.numberOfMoves[computerColor] = 0;
+            match.computerPlayer = { id: computerId, color: computerColor };
+            computerAdded = true;
+        }
+
+        // Fill remaining slots if any
+        while (availableColors.length > 0) {
+            let color = availableColors.shift();
+            if (computerAdded) {
+                // Add another manual player if possible
+                if (playerIndex < players.length) {
+                    match.player[color] = { id: players[playerIndex] };
+                    playerIndex++;
+                } else {
+                    // If no more manual players, leave empty
+                    match.player[color] = { id: null };
+                }
+            } else {
+                // Add a computer player
+                let computerId = generateComputerId();
+                match.player[color] = { id: computerId };
+                match.computerPlayer = { id: computerId, color: color };
+                computerAdded = true;
+            }
+            match.playerPosition[color] = [0, 0, 0, 0];
+            match.numberOfMoves[color] = 0;
+        }
+
+        // Set WinOrLoose based on winningIndices
+        match.WinOrLoose = winningIndices.includes(matches.length);
+
+        matches.push(match);
+    }
+
+    return matches;
+}
+
+// right now we are able to create matches 
+// next step is to how to set compute in for that
+
+module.exports.createMatch = async (req, res) => {
+    try {
+        let InsertedDoc
+        console.log("Creating match");
+        const FoundDoC = await ludoMatchTableList.findOne();
+        let fiveThousandPlayers = FoundDoC.fiveThousand;
+        let oneThousandPlayers = FoundDoC.thousand
+        let twoThousandPlayers = FoundDoC.twoThousand
+        let tenThousandPlayers = FoundDoC.tenThousands
+        let insertThis = generateMatch(fiveThousandPlayers, "fiveThousand");
+        if(insertThis){
+            InsertedDoc = await matchDB.insertMany(insertThis);
+        }
+        insertThis = generateMatch(oneThousandPlayers, "thousand");
+        if(insertThis){
+            InsertedDoc = await matchDB.insertMany(insertThis);
+        }
+        insertThis = generateMatch(twoThousandPlayers, "twoThousand");
+        if(insertThis){
+            InsertedDoc = await matchDB.insertMany(insertThis);
+        }
+        insertThis = generateMatch(tenThousandPlayers, "tenThousands");
+        if(insertThis){
+            InsertedDoc = await matchDB.insertMany(insertThis);
+        }
+        
+        console.log(InsertedDoc)
+
+        
+        res.send(InsertedDoc);
+    } catch (error) {
+        console.log("Error creating match:", error);
+        res.status(500).send(error);
+    }
+}
+
 module.exports.Testmatch = async (req,res)=>{
-    const test = await matchDB.findById("66a9df57e884d698335c11f1")
-    console.log(test.WinOrLoose)
-    test.WinOrLoose = !test.WinOrLoose
-    await test.save()
-    res.send()
+    try {
+        const Found = await matchDB.findOne(req.body.matchId)
+        const udpate = await matchDB.updateOne()
+    } catch (error) {
+        console.log(error)
+        res.send(error)
+    }
 }
 
 
@@ -143,18 +247,16 @@ module.exports.createLudouser = async (req,res)=>{
 
 module.exports.ResultDeclare = async (req, res) => {
     const { result, username } = req.body;
-  
     try {
       const updateQuery = {
         $inc: result ? { "matchstats.won": 1 } : { "matchstats.lost": 1 }
       };
-  
+
       const updatedUser = await userDB.findOneAndUpdate(
         { userName: username },
         updateQuery,
         { new: true }
       );
-  
       if (!updatedUser) {
         return res.status(404).json({ error: 'User not found' });
       }

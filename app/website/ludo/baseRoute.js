@@ -7,7 +7,7 @@ const router = express.Router()
 
 
 
-router.get("/wi",ludoUserContoller.First)
+// router.get("/wi",ludoUserContoller.First)
 router.get("/createMatch",ludoUserContoller.createMatch)
 router.get("/Movement",ludoUserContoller.Movement)
 router.get("/createLudoUser",ludoUserContoller.createLudouser)
@@ -16,7 +16,7 @@ router.get("/SetCategoryPrediciton",ludoUserContoller.SetCategoryPrediciton)
 router.get("/test",ludoUserContoller.Testmatch)
 router.get("/matchStart",ludoUserContoller.matchStart)
 router.get("/fetchingPosition",ludoUserContoller.fetchingPosition)
-
+router.get("/gameSignin",ludoUserContoller.GameSignin)
 
 
 module.exports = router
