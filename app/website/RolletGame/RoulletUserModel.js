@@ -17,6 +17,14 @@ const RolletUser = new mongoose.Schema({
         type:Number,
         default:0
     },
+    ratio:{
+        type:Number,
+        default:7
+    },
+    winningIndices:{
+        type:[Number],
+        default:null
+    },
     bets:[{
         betType: { type: String, required: true },
         amount: { type: Number, required: true },

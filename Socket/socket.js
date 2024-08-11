@@ -1,7 +1,13 @@
-
+const axios = require("axios");
 const socketIo = require("socket.io");
-
-const RolletController = require("../app/website/RolletGame/Controller")
+const fs = require("fs");
+const path = require("path");
+// const Match = require("./../app/website/matchList/Match.model"); // Adjust the path as necessary
+// const Market = require("../app/website/matchList/Market.model");
+// const matchScore = require("../app/website/matchList/ScoreMatchId.model");
+// const Bookmakers_List = require("../app/website/matchList/Bookmakers_List.model");
+// const casinoshortnameModel = require("../app/website/casino/model/casinoshortname.model");
+// const StoreLastdataAndDeclearResult = require("../app/utils/DeclearCasinoResult");
 
 const demodata = {
   "message": "Data Fetched",
@@ -221,14 +227,14 @@ const demodata = {
 }
 
 // Define the path to the log file
-// const logFilePath = path.join(__dirname, "error.log");
+const logFilePath = path.join(__dirname, "error.log");
 
 // Function to log messages to a file
 const logError = (message) => {
   const timestamp = new Date().toISOString();
-  // fs.appendFile(logFilePath, `${timestamp} - ERROR: ${message}\n`, (err) => {
-  //   if (err) console.error("Failed to write to log file:", err.message);
-  // });
+  fs.appendFile(logFilePath, `${timestamp} - ERROR: ${message}\n`, (err) => {
+    if (err) console.error("Failed to write to log file:", err.message);
+  });
 };
 
 // Function to get the current date in IST format (YYYY-MM-DD)
@@ -357,7 +363,7 @@ const updateSessionOdds = async (matchId, marketId, BookmakersId) => {
 
     let MatchOdds = []
     if (BookmakersId) {
-      await fetchDataFromAPI(oddsUrl);
+      MatchOdds = await fetchDataFromAPI(oddsUrl);
     }
     const scorecboardData = await fetchDataFromAPI(scoreUrl);
 
@@ -377,8 +383,6 @@ let latestData = {};
 
 const emitCricketData = async (io, matchId) => {
   try {
-    console.log(matchId)
-    
     const market = await Market.findOne({ match: matchId });
 
     console.log(`cricket data data for market Id ${market} and match id ${matchId}`)
@@ -400,10 +404,16 @@ const emitCricketData = async (io, matchId) => {
     }
 
     io.to(`match_${matchId}`).emit("receiveData", {
-      fetchedData: latestData[matchId]?.fetchedData || [],
-      MatchOdds: latestData[matchId]?.MatchOdds || [],
-      scorecboardData: latestData[matchId]?.scorecboardData || {}
+      fetchedData: latestData[matchId].fetchedData,
+      MatchOdds: latestData[matchId].MatchOdds,
+      scorecboardData: latestData[matchId].scorecboardData
     });
+
+    // io.to(`match_${matchId}`).emit("receiveData", {
+    //   fetchedData: latestData[matchId]?.fetchedData || [],
+    //   MatchOdds: latestData[matchId]?.MatchOdds || [],
+    //   scorecboardData: latestData[matchId]?.scorecboardData || {}
+    // });
   } catch (error) {
     const errorMessage = `Error processing cricket data for matchId ${matchId}: ${error.message}`;
     console.error(errorMessage);
@@ -423,8 +433,6 @@ const CasinoAPIData = async (shortname) => {
     console.log("this casino data fetchedCasinoData", fetchedCasinoData)
     return { fetchedCasinoData: fetchedCasinoData };
 
-
-    
   } catch (error) {
     const errorMessage = `Error updating casino data: ${error.message}`;
     console.error(errorMessage);
@@ -444,14 +452,16 @@ const CasinoData = async (io, gameId) => {
 
     const fetchedCasinoData = response?.fetchedCasinoData || {};
 
-    latestCasinoData[gameId] = { fetchedCasinoData };
+    if (Object.keys(fetchedCasinoData).length > 0) {
+      latestCasinoData[gameId] = { fetchedCasinoData };
+    }
 
     StoreLastdataAndDeclearResult(latestCasinoData[gameId]?.fetchedCasinoData?.data)
 
     // Emit the full data to the specific room
     io.to(`casino_${gameId}`).emit("receiveData", {
       message: "Successfully fetched",
-      data: latestCasinoData[gameId]?.fetchedCasinoData || {},
+      data: latestCasinoData[gameId].fetchedCasinoData,
     });
 
   } catch (error) {
@@ -608,7 +618,7 @@ const setupSocket = (server) => {
           }
 
           if (CasinoRoomCound[gameId] === 0 && Casinointervals[gameId]) {
-            clearInterval(Casinointervals[gameId]);
+            // clearInterval(Casinointervals[gameId]);
             delete Casinointervals[gameId];
           }
         } catch (error) {
@@ -618,9 +628,7 @@ const setupSocket = (server) => {
         }
       });
       
-      socket.on("yes",()=>{
-        console.log("resolve")
-      })
+
       socket.on("disconnect", () => {
         // console.log("A user disconnected", socket.id);
 
@@ -637,8 +645,8 @@ const setupSocket = (server) => {
         });
       });
     } catch (error) {
-      const errorMessage = `Error handling socket connection: ${error}`;
-      console.error(errorMessage,"bharat jagoar ");
+      const errorMessage = `Error handling socket connection: ${error.message}`;
+      console.error(errorMessage);
       logError(errorMessage);
     }
   });
@@ -646,4 +654,4 @@ const setupSocket = (server) => {
   return io;
 };
 
-module.exports = {setupSocket};
+module.exports = setupSocket;

@@ -309,3 +309,14 @@ module.exports.fetchingPosition = async (req,res)=>{
         res.send(error)
     }
 }
+
+
+
+
+
+
+module.exports.Matchgame = async (io) =>{
+    console.log("helll wor")
+    io.emit("yes",{message:"hello world"})
+    return
+}

@@ -76,19 +76,40 @@ module.exports.Result = async (req,res)=>{
     }   
 }
 
+
+function getRandomNumberExceptZero(num) {
+    let randomNumber;
+    do {
+      randomNumber = Math.floor(Math.random() * 36) + 1; // Generate a random number between 1 and 36
+    } while (randomNumber === num || randomNumber == 0);
+    return randomNumber;
+  }
+  
+
+
 module.exports.getNumber = async (req,res)=>{
     console.log("from getnumber")
     const {number,userId} = req.body
     console.log(number)
     
     try {
-        const userData = await RolletUserDB.findOne({userName:userId})
-    } catch (error) {
+        const {win,lost,ratio} = await RolletUserDB.findOne({userName:userId})
         
+        console.log(win,lost)
+        let currentRatio = lost/win
+        if(currentRatio>ratio){
+            res.send(number)
+        }else{
+            let prediction = getRandomNumberExceptZero(number)
+            res.send({prediction})
+        }
+    } catch (error){
+        console.log("hello")
+        console.log(error)
     }
 
 
-    res.send()
+    // res.send()
 }
 
 module.exports.getDataAdmin =async (req,res)=>{
@@ -122,5 +143,55 @@ module.exports.updateNumberCount = async (req,res)=>{
     } catch (error) {
         console.log(error)
         res.send(error)
+    }
+}
+
+function generateUniqueRandomArray(start, end, item) {
+    const range = end - start + 1;
+    if (item > range) {
+      throw new Error('Item count cannot be greater than range');
+    }
+  
+    const numbers = [];
+    while (numbers.length < item) {
+      const randomNum = Math.floor(Math.random() * range) + start;
+      if (!numbers.includes(randomNum)) {
+        numbers.push(randomNum);
+      }
+    }
+    return numbers;
+}
+
+function genarr(number,ratio){
+    let percet = ratio/100
+    const sixty = Math.round(number * percet);
+    let arr = generateUniqueRandomArray(0, number - 1, sixty);
+    console.log(number,arr)
+    return arr;
+}
+
+module.exports.setRatio = async (req,res)=>{
+    const {percent,numberOfbets} = req.body
+    let Indices = genarr(number,percent)
+    
+    try {
+        if(percent&&numberOfbets){
+            const UpdatedDoc = await RolletUserDB.updateMany(
+                {},
+                {$set:{ratio:percent,winningIndices:Indices}},
+                {new:true}
+            )
+            console.log(UpdatedDoc)
+        }else if(percent){
+            const updateDOC = await RolletUserDB.updateMany(
+                {},
+                {$set:{ratio:percent}},
+                {new:true}
+            )
+        }
+        res.send()
+    } catch (error) {
+     console.log(error)
+     res.send(error)
     }
 }
