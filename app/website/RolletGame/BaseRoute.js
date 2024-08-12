@@ -9,8 +9,8 @@ Router.get("/Start",RolletController.startBetting)
 Router.get("/createUser",RolletController.createUser)
 Router.get("/startBetting",RolletController.startBetting)
 Router.post("/ResultRollet",RolletController.Result)
-Router.get("/getNumber",RolletController.getNumber)
-Router.get("/setRatio",RolletController.setRatio)
+Router.get("/RolletgetNumber/:number/:userId",RolletController.getNumber)
+Router.post("/RolletsetRatio",RolletController.setRatio)//changes needs to be there
 // Router.get("/getAdminData",RolletController.getDataAdmin)
 // Router.get("/updateNumberCount",RolletController.updateNumberCount)
 

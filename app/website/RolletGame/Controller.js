@@ -24,7 +24,6 @@ module.exports.createUser = async (req,res)=>{
 
 
 module.exports.startBetting = async(req,res)=>{
-
     const {username,betdet} = req.body
     const date = new Date()
     if (!betdet.betType || !betdet.amount) {
@@ -39,13 +38,12 @@ module.exports.startBetting = async(req,res)=>{
             {$push:{bets:betdet}},
             {new:true}
         )
-        console.log(updateDOC)
+        console.log("updateDOC",updateDOC,"updateDOC")
         res.send(updateDOC)
     } catch (error) {
         console.log(error)
         res.send(error)
     }
-    // res.send("afdsafdsa")
 }
 
 module.exports.Result = async (req,res)=>{
@@ -77,38 +75,57 @@ module.exports.Result = async (req,res)=>{
 }
 
 
-function getRandomNumberExceptZero(num) {
-    let randomNumber;
-    do {
-      randomNumber = Math.floor(Math.random() * 36) + 1; // Generate a random number between 1 and 36
-    } while (randomNumber === num || randomNumber == 0);
+function getRandomNumberExcluding(excludedNumber) {
+    // Generate a random number between 0 and 35
+    let randomNumber = Math.floor(Math.random() * 37);
+    
+    // If the generated number is the one to be excluded, generate again
+    while (randomNumber === excludedNumber) {
+        randomNumber = Math.floor(Math.random() * 37);
+    }
+    
     return randomNumber;
-  }
-  
+}
 
 
 module.exports.getNumber = async (req,res)=>{
     console.log("from getnumber")
-    const {number,userId} = req.body
+    // console.log(req.params)
+    const {number,userId} = req.params
     console.log(number)
-    
+    let responumber =getRandomNumberExcluding(number)
+    console.log(number,responumber)
     try {
-        const {win,lost,ratio} = await RolletUserDB.findOne({userName:userId})
+        const {winningIndices,numberOfbets,numberOfmoves} = await RolletUserDB.findOne({userName:userId}).select("winningIndices numberOfbets numberOfmoves")
+        // console.log(numberOfbets,winningIndices)
+        let exactNumber = numberOfbets%numberOfmoves
         
-        console.log(win,lost)
-        let currentRatio = lost/win
-        if(currentRatio>ratio){
-            res.send(number)
-        }else{
-            let prediction = getRandomNumberExceptZero(number)
-            res.send({prediction})
+        console.log(exactNumber,winningIndices.includes(exactNumber),"windows alert",numberOfbets,numberOfmoves)
+        
+        if(winningIndices.includes(exactNumber)){
+            console.log("win")
+            res.send({number})
+        }else{ 
+            console.log("loose",)
+            res.send({responumber})
         }
+        // let currentRatio = lost/win
+        // if(currentRatio>ratio){
+        //     res.send(number)
+        // }else{
+        //     let prediction = getRandomNumberExceptZero(number)
+        //     res.send({prediction})
+        // }
+
+        const updateDOC = await RolletUserDB.findOneAndUpdate(
+            {userName:"bharatjagoar"},
+            {$inc:{numberOfbets:1}}
+        )
+        
     } catch (error){
         console.log("hello")
         console.log(error)
     }
-
-
     // res.send()
 }
 
@@ -170,26 +187,41 @@ function genarr(number,ratio){
     return arr;
 }
 
-module.exports.setRatio = async (req,res)=>{
-    const {percent,numberOfbets} = req.body
-    let Indices = genarr(number,percent)
+function generateUniqueArray(moves, percentage) {
+    // Calculate the number of items to include in the array
+    const itemCount = Math.round((moves * percentage) / 100);
     
+    // Use a Set to ensure unique values
+    const uniqueValues = new Set();
+    
+    // Populate the set with unique random values between 1 and 10
+    while (uniqueValues.size < itemCount) {
+        uniqueValues.add(Math.floor(Math.random() * 10) + 1);
+    }
+    
+    // Convert the set back to an array and return it
+    return Array.from(uniqueValues);
+}
+
+
+
+
+
+module.exports.setRatio = async (req,res)=>{
+
+    const {percentage,numberOfmoves} = req.body
+    let totalNumber = numberOfmoves*(percentage/100)
+    let arr = generateUniqueArray(numberOfmoves,percentage)
     try {
-        if(percent&&numberOfbets){
-            const UpdatedDoc = await RolletUserDB.updateMany(
-                {},
-                {$set:{ratio:percent,winningIndices:Indices}},
-                {new:true}
-            )
-            console.log(UpdatedDoc)
-        }else if(percent){
-            const updateDOC = await RolletUserDB.updateMany(
-                {},
-                {$set:{ratio:percent}},
-                {new:true}
-            )
-        }
-        res.send()
+        const UpdateDoc = await RolletUserDB.updateMany(
+            {},
+            {$set:{winningIndices:arr,numberOfbets:0,numberOfmoves:numberOfmoves}},
+            {new:true}
+        )
+        console.log(UpdateDoc)
+        console.log(arr)
+        console.log("windows")
+        res.send("hello world ")
     } catch (error) {
      console.log(error)
      res.send(error)

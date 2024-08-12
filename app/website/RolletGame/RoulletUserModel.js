@@ -13,6 +13,9 @@ const RolletUser = new mongoose.Schema({
         type:Number,
         default:0
     },
+    numberOfmoves:{
+        type:Number,
+    },
     numberOfbets:{
         type:Number,
         default:0
@@ -28,9 +31,10 @@ const RolletUser = new mongoose.Schema({
     bets:[{
         betType: { type: String, required: true },
         amount: { type: Number, required: true },
-        date: { type: Date, default: Date.now }
+        date: { type: Date, default: Date.now },
+        betdata:mongoose.SchemaTypes.Mixed
     }]
-})
+},{timestamps:true})
 
 const RolletUserModel = mongoose.model('RolletUserdata', RolletUser);
 

@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 app.use(express.json())
 app.use(cors());
-const {setupSocket} = require('./Socket/socket');
+const setupSocket = require('./Socket/socket');
 const port = process.env.PORT
 
 // Admin
