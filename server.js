@@ -28,7 +28,7 @@ app.use(process.env.WEBSITE_ROUTES,require("./app/website/statements/routes/Stat
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/matchList/Match.routes"));
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/ludo/baseRoute"));
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/RolletGame/BaseRoute"));
-
+app.use(process.env.WEBSITE_ROUTES,require("./app/website/lottery/routes/index"));
 
 
 

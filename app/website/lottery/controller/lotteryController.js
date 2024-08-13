@@ -226,115 +226,152 @@ const timeIntervals = moment.duration(1, "minutes");
 
 
 
-module.exports.createBet = async (req,res)=>{
-  console.log("hello")
-  console.log(req.body)
-  const {userId , betType,openNumber}=req.body
-  const obj={}
-  // obj[`${betType}`] = openNumber
-  try {
-      const createBet = await lotteryBetModel.create(req.body)
-      console.log(createBet)
-      res.send(createBet)
-  } catch (error) {
-    console.log(error)
-    res.send(error)
-  }
+module.exports.createBet = async (req, res) => {
+    console.log("hello")
+    console.log(req.body)
+    const { userId, betType, openNumber } = req.body
+    const obj = {}
+    // obj[`${betType}`] = openNumber
+    try {
+        const createBet = await lotteryBetModel.create(req.body)
+        console.log(createBet)
+        res.send(createBet)
+    } catch (error) {
+        console.log(error)
+        res.send(error)
+    }
 }
 
 module.exports.readBetsfromType = async (req, res) => {
-  const { betType } = req.body;
-  try {
-    let pipeline;
+    const { betType } = req.body;
+    try {
+        let pipeline;
 
-    if (betType === "teen" || betType === "jodi") {
-      pipeline = [
-        { $match: { betType: betType } },
-        {
-          $addFields: {
-            lastDigit: {
-              $cond: {
-                if: { $gte: ["$Bettingnumber", 10] },
-                then: { $mod: ["$Bettingnumber", 10] },
-                else: "$Bettingnumber"
-              }
-            }
-          }
-        },
-        {
-          $group: {
-            _id: "$lastDigit",
-            count: { $sum: 1 },
-            totalAmount: { $sum: "$ammount" }
-          }
+        if (betType === "teen" || betType === "jodi") {
+            pipeline = [
+                { $match: { betType: betType } },
+                {
+                    $addFields: {
+                        lastDigit: {
+                            $cond: {
+                                if: { $gte: ["$Bettingnumber", 10] },
+                                then: { $mod: ["$Bettingnumber", 10] },
+                                else: "$Bettingnumber"
+                            }
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$lastDigit",
+                        count: { $sum: 1 },
+                        totalAmount: { $sum: "$ammount" }
+                    }
+                }
+            ];
+        } else {
+            pipeline = [
+                { $match: { betType: betType } },
+                {
+                    $group: {
+                        _id: "$Bettingnumber",
+                        count: { $sum: 1 },
+                        totalAmount: { $sum: "$ammount" }
+                    }
+                }
+            ];
         }
-      ];
-    } else {
-      pipeline = [
-        { $match: { betType: betType } },
-        {
-          $group: {
-            _id: "$Bettingnumber",
-            count: { $sum: 1 },
-            totalAmount: { $sum: "$ammount" }
-          }
-        }
-      ];
+
+        // Common stages for all bet types
+        pipeline = pipeline.concat([
+            {
+                $project: {
+                    _id: 0,
+                    Bettingnumber: "$_id",
+                    count: 1,
+                    totalAmount: 1
+                }
+            },
+            { $sort: { Bettingnumber: 1 } }
+        ]);
+
+        const result = await lotteryBetModel.aggregate(pipeline);
+
+        console.log(result);
+        res.send(result);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
     }
-
-    // Common stages for all bet types
-    pipeline = pipeline.concat([
-      {
-        $project: {
-          _id: 0,
-          Bettingnumber: "$_id",
-          count: 1,
-          totalAmount: 1
-        }
-      },
-      { $sort: { Bettingnumber: 1 } }
-    ]);
-
-    const result = await lotteryBetModel.aggregate(pipeline);
-
-    console.log(result);
-    res.send(result);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
-  }
 };
 
 
-module.exports.SetBettingNumber = async (req,res)=>{
+module.exports.SetBettingNumber = async (req, res) => {
     console.log("from setBet")
-    const {number,type} = req.body
+    const { number, type } = req.body
     let obj = {}
     let query = `${type}`
     obj[query] = number
     try {
         const respo = await Lotterymodel.findOneAndUpdate(
-          {},
-          {$set:obj},
-          {new:true}
+            {},
+            { $set: obj },
+            { new: true }
         )
         console.log(respo)
         res.send(respo)
     } catch (error) {
-      console.log("hello from err",error)
-      res.send(error)
+        console.log("hello from err", error)
+        res.send(error)
     }
-    
+
 }
 
-module.exports.result = async (req,res)=>{
-  console.log("hello world")
-  try {
-      const foundDoc = await lotteryModel.findOne({})
-      console.log(foundDoc)
-      res.send(foundDoc)
-  } catch (error) {
-    console.log(error)
-    res.send(error)
-  }
+module.exports.result = async (req, res) => {
+    console.log("hello world")
+    try {
+        const foundDoc = await lotteryModel.findOne({})
+        console.log(foundDoc)
+        res.send(foundDoc)
+    } catch (error) {
+        console.log(error)
+        res.send(error)
+    }
+}
+
+
+
+module.exports.GettheLotteryNumber = async (req, res) => {
+    console.log("hello")
+    try {
+        const respo = await lotteryModel.findOne({})
+        console.log(respo)
+        res.send()
+    } catch (error) {
+        console.log(error)
+    }
+    console.log("from getthe number")
+    // res.send("frm get the number")
+}
+
+
+
+module.exports.ResetNumber = async (req,res)=>{
+    console.log("from reset")
+    try {
+        const UpdatedDOC =await lotteryModel.findOneAndUpdate(
+            {},
+            {$set:{
+                firstNumber:-1,
+                secondNumber:-1,
+                thirdNumber:-1
+            }},
+            {new:true}
+        )
+
+        console.log(UpdatedDOC)
+    } catch (error) {
+        console.log(error,"eror")
+    }
+    res.send("from reset")
 }
