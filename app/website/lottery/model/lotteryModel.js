@@ -17,30 +17,19 @@ const lotteryGameSchema = new mongoose.Schema({
     type: Number
     // default: "NULL",
   },
-  startTime: {
+  dateToday: {
     type: String
     // required: true,
   },
+  day:{
+    type:String 
+  }
 });
 
 let Lotterymodel = mongoose.model("lotteryModel", lotteryGameSchema);
 
-const instantiate = async ()=>{
-    try {
-        const found = await Lotterymodel.findOne()
-        if(!found){
-          const createdDOC = await Lotterymodel.create({})
-          // console.log("create new one",createdDOC)
 
-        }else{
-          // console.log("found bhbhbh",found)
-        }
-    } catch (error) {
-      console.log(error)
-    }
-}
 
-instantiate()
 
 
 module.exports = Lotterymodel

@@ -4,6 +4,7 @@ const clientModel = require("../../../admin/Users/models/client.model");
 const lotteryBetModel = require("../model/lotteryBetModel");
 const Lotterymodel = require("../model/lotteryModel");
 
+
 const dateFormate = "YYYY-MM-DD, HH:mm:ss";
 const timeIntervals = moment.duration(1, "minutes");
 
@@ -307,19 +308,39 @@ module.exports.readBetsfromType = async (req, res) => {
 
 
 module.exports.SetBettingNumber = async (req, res) => {
+    let now = moment();
+    let futureDate = now.add(4, "days"); // Create a Moment object for the future date
+    
+    let formattedDate = futureDate.format("DD MM YYYY"); // Format the future date as desired
+    const day=futureDate.format("dddd")
+    console.log(formattedDate,day); // Output: DD MM YYYY format of the future date
+    
     console.log("from setBet")
     const { number, type } = req.body
     let obj = {}
     let query = `${type}`
     obj[query] = number
+
+
     try {
-        const respo = await Lotterymodel.findOneAndUpdate(
-            {},
-            { $set: obj },
-            { new: true }
-        )
-        console.log(respo)
-        res.send(respo)
+        const findDOC = await Lotterymodel.findOne({ dateToday: formattedDate })
+
+        if (findDOC) {
+            const findDOC = await Lotterymodel.findOneAndUpdate(
+                { dateToday: formattedDate },
+                { $set: obj },
+                { new: true }
+            )
+            console.log(findDOC,"dind DOC")
+            res.send(findDOC)
+        } else {
+            obj["dateToday"] = formattedDate
+            obj["day"] = day
+            const createDoc = await Lotterymodel.create(obj)
+            console.log("created ", createDoc)
+            res.send(createDoc)
+        }
+        
     } catch (error) {
         console.log("hello from err", error)
         res.send(error)
@@ -342,36 +363,44 @@ module.exports.result = async (req, res) => {
 
 
 module.exports.GettheLotteryNumber = async (req, res) => {
+    // const {date} = req.body
     console.log("hello")
+    console.log("from getthe number")
     try {
-        const respo = await lotteryModel.findOne({})
+        const respo = await lotteryModel.find({})
         console.log(respo)
-        res.send()
-    } catch (error) {
+        res.send(respo)
+    } catch (error){
         console.log(error)
     }
-    console.log("from getthe number")
     // res.send("frm get the number")
 }
 
 
 
-module.exports.ResetNumber = async (req,res)=>{
+module.exports.ResetNumber = async (req, res) => {
     console.log("from reset")
-    try {
-        const UpdatedDOC =await lotteryModel.findOneAndUpdate(
-            {},
-            {$set:{
-                firstNumber:-1,
-                secondNumber:-1,
-                thirdNumber:-1
-            }},
-            {new:true}
-        )
+    let year = moment()
+    // let year =  year.format("dd DD")
 
-        console.log(UpdatedDOC)
-    } catch (error) {
-        console.log(error,"eror")
-    }
-    res.send("from reset")
+    let dare = year.format("dd DD")
+    console.log(dare)
+
+    // try {
+    //     const UpdatedDOC =await lotteryModel.findOneAndUpdate(
+    //         {},
+    //         {$set:{
+    //             firstNumber:-1,
+    //             secondNumber:-1,
+    //             thirdNumber:-1
+    //         }},
+    //         {new:true}
+    //     )
+
+    //     console.log(UpdatedDOC)
+    // } catch (error) {
+    //     console.log(error,"eror")
+    // }
+    // res.send("from reset")
+    res.send()
 }
