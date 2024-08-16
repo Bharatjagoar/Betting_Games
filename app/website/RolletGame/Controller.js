@@ -3,6 +3,8 @@ const dataDB = require("./bettingdataModel")
 // const {setupSocket} = require("../../../Socket/socket")
 
 // const io = setupSocket()
+let red=[1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]
+let black = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]
 
 module.exports.Main=async ( req , res)=>{
     console.log("hello world ")
@@ -76,20 +78,22 @@ module.exports.Result = async (req,res)=>{
 
 
 function getRandomNumberExcluding(excludedNumber) {
-    // Generate a random number between 0 and 35
-    let randomNumber = Math.floor(Math.random() * 37);
-    
-    // If the generated number is the one to be excluded, generate again
-    while (randomNumber === excludedNumber) {
-        randomNumber = Math.floor(Math.random() * 37);
-    }
-    
-    return randomNumber;
-}
+    // Create an array of all possible numbers including 0 and 00
+    const allNumbers = [0, "00", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36];
+  
+    // Remove the excluded number from the array
+    const filteredNumbers = allNumbers.filter(num => num !== excludedNumber);
+  
+    // Generate a random index within the filtered array
+    const randomIndex = Math.floor(Math.random() * filteredNumbers.length);
+  
+    return filteredNumbers[randomIndex] === '00' ? 0 : parseInt(filteredNumbers[randomIndex])
+  }
 
 
 module.exports.getNumber = async (req,res)=>{
     console.log("from getnumber")
+    let colors
     // console.log(req.params)
     const {number,userId} = req.params
     console.log(number)
@@ -104,10 +108,33 @@ module.exports.getNumber = async (req,res)=>{
         
         if(winningIndices.includes(exactNumber)){
             console.log("win")
+            if(number%2==0){
+                console.log("even")
+            }else{
+                console.log("odd")
+            }
+            if(red.includes(number)){
+                colors="red"
+            }
+            if(black.includes(responumber)){
+                colors="black"
+            }
             res.send({number})
         }else{ 
-            console.log("loose",)
-            res.send({responumber})
+            console.log("loose")
+            if(responumber%2==0){
+                console.log("even")
+            }else{
+                console.log("odd")
+            }
+            if(red.includes(responumber)){
+                colors="red"
+            }
+            if(black.includes(responumber)){
+                colors="black"
+            }
+            
+            res.send({"number":responumber})
         }
         // let currentRatio = lost/win
         // if(currentRatio>ratio){
