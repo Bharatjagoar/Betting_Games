@@ -241,6 +241,121 @@ module.exports.createBet = async (req, res) => {
         console.log(error)
         res.send(error)
     }
+
+    // console.log("hello");
+    // console.log(req.body);
+    // const { userId, betType, openNumber, amount } = req.body;
+
+    // // Check if userId is present
+    // if (!userId) {
+    //     return res.status(400).send({ error: "UserId is required" });
+    // }
+
+    // // Check if openNumber and amount are valid numbers
+    // if (isNaN(openNumber) || isNaN(amount)) {
+    //     return res.status(400).send({ error: "Invalid openNumber or amount" });
+    // }
+
+    // try {
+    //     let bets = [];
+
+    //     // Function to create a single bet
+    //     const createSingleBet = async (type, number, amt) => {
+    //         return await lotteryBetModel.create({
+    //             UserId: userId,
+    //             betType: type,
+    //             Bettingnumber: number,
+    //             ammount: amt
+    //         });
+    //     };
+
+    //     // Extract digits
+    //     const hundreds = Math.floor(openNumber / 100);
+    //     const tens = Math.floor((openNumber % 100) / 10);
+    //     const ones = openNumber % 10;
+
+    //     // Validate extracted digits to ensure they are numbers
+    //     if (isNaN(hundreds) || isNaN(tens) || isNaN(ones)) {
+    //         return res.status(400).send({ error: "Invalid number extraction" });
+    //     }
+
+    //     // Create bets based on betType
+    //     if (betType === 'teen') {
+    //         bets.push(await createSingleBet('single', hundreds, amount / 3));
+    //         bets.push(await createSingleBet('jodi', tens, amount / 3));
+    //         bets.push(await createSingleBet('teen', ones, amount / 3));
+    //     } else if (betType === 'jodi') {
+    //         bets.push(await createSingleBet('single', tens, amount / 2));
+    //         bets.push(await createSingleBet('jodi', ones, amount / 2));
+    //     } else if (betType === 'single') {
+    //         bets.push(await createSingleBet('single', ones, amount));
+    //     }
+
+    //     console.log(bets);
+    //     res.send(bets);
+    // } catch (error) {
+    //     console.log(error);
+    //     res.status(500).send(error);
+    // }
+
+
+
+    // console.log("hello");
+    // console.log(req.body);
+    // const { UserId, betType, openNumber, amount } = req.body;
+
+    // // Check if userId is present
+    // if (!UserId) {
+    //     return res.status(400).send({ error: "UserId is required" });
+    // }
+
+    // // Check if openNumber and amount are valid numbers
+    // if (isNaN(openNumber) || isNaN(amount)) {
+    //     console.log(openNumber,amount)
+    //     return res.status(400).send({ error: "Invalid openNumber or amount" });
+    // }
+
+    // try {
+    //     let bets = [];
+
+    //     // Function to create a single bet
+    //     const createSingleBet = async (type, number, amt) => {
+    //         return await lotteryBetModel.create({
+    //             UserId: UserId,
+    //             betType: type,
+    //             Bettingnumber: number,
+    //             ammount: amt
+    //         });
+    //     };
+
+    //     // Extract digits
+    //     const hundreds = Math.floor(openNumber / 100);
+    //     const tens = Math.floor((openNumber % 100) / 10);
+    //     const ones = openNumber % 10;
+
+    //     // Validate extracted digits to ensure they are numbers
+    //     if (isNaN(hundreds) || isNaN(tens) || isNaN(ones)) {
+    //         return res.status(400).send({ error: "Invalid number extraction" });
+    //     }
+
+    //     // Create bets based on betType
+    //     if (betType === 'teen') {
+    //         bets.push(await createSingleBet('single', hundreds, amount / 3));
+    //         bets.push(await createSingleBet('jodi', tens, amount / 3));
+    //         bets.push(await createSingleBet('teen', ones, amount / 3));
+    //     } else if (betType === 'jodi') {
+    //         bets.push(await createSingleBet('single', tens, amount / 2));
+    //         bets.push(await createSingleBet('jodi', ones, amount / 2));
+    //     } else if (betType === 'single') {
+    //         bets.push(await createSingleBet('single', ones, amount));
+    //     }
+
+    //     console.log(bets);
+    //     res.send(bets);
+    // } catch (error) {
+    //     console.log(error);
+    //     res.status(500).send(error);
+    // }
 }
 
 module.exports.readBetsfromType = async (req, res) => {
