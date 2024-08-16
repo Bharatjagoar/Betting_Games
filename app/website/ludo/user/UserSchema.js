@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 
 const ludoUserSchema = new mongoose.Schema({
     userName:{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
         required:true
     },
     matchstats:{

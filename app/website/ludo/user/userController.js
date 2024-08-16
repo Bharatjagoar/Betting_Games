@@ -135,6 +135,7 @@ module.exports.createMatch = async (req, res) => {
         let InsertedDoc
         console.log("Creating match");
         const FoundDoC = await ludoMatchTableList.findOne();
+        let matchesCreated=[]
         let fiveThousandPlayers = FoundDoC.fiveThousand;
         let oneThousandPlayers = FoundDoC.thousand
         let twoThousandPlayers = FoundDoC.twoThousand
@@ -142,24 +143,27 @@ module.exports.createMatch = async (req, res) => {
         let insertThis = generateMatch(fiveThousandPlayers, "fiveThousand");
         if(insertThis){
             InsertedDoc = await matchDB.insertMany(insertThis);
+            InsertedDoc&&matchesCreated.push(InsertedDoc)
         }
         insertThis = generateMatch(oneThousandPlayers, "thousand");
         if(insertThis){
             InsertedDoc = await matchDB.insertMany(insertThis);
+            InsertedDoc&&matchesCreated.push(InsertedDoc)
         }
         insertThis = generateMatch(twoThousandPlayers, "twoThousand");
         if(insertThis){
             InsertedDoc = await matchDB.insertMany(insertThis);
+            InsertedDoc&&matchesCreated.push(InsertedDoc)
         }
         insertThis = generateMatch(tenThousandPlayers, "tenThousands");
         if(insertThis){
             InsertedDoc = await matchDB.insertMany(insertThis);
+            InsertedDoc&&matchesCreated.push(InsertedDoc)
         }
-        
-        console.log(InsertedDoc)
 
+        console.log(matchesCreated)
         
-        res.send(InsertedDoc);
+        res.send(matchesCreated);
     } catch (error) {
         console.log("Error creating match:", error);
         res.status(500).send(error);
@@ -192,13 +196,14 @@ module.exports.matchStart = async (req,res)=>{
 module.exports.Movement=async (req,res)=>{
     // task here is to generate the move and also 
     // udpate the movement in backend 
+    //if the win or loose is set to true , this means that computer has to win
+    // else the player has to win
     console.log(req.body)
     try {
         const {player,numberOfMoves} = req.body
         const match = await matchDB.findById(req.body.matchId)
         const findQuery = {}
         let updateQuery = `playerPosition.${req.body.color}.${req.body.peice}`
-        
         console.log(match)
         let predict = match.WinOrLoose
         let move

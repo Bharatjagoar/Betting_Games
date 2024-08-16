@@ -2,6 +2,7 @@ const axios = require("axios");
 const socketIo = require("socket.io");
 const fs = require("fs");
 const path = require("path");
+const AndarBaharManual = require("../app/website/andarBaharManual/controller/controller")
 // const Match = require("./../app/website/matchList/Match.model"); // Adjust the path as necessary
 // const Market = require("../app/website/matchList/Market.model");
 // const matchScore = require("../app/website/matchList/ScoreMatchId.model");
@@ -502,7 +503,7 @@ const setupSocket = (server) => {
         try {
             const specificDate = getTodayDateIST();
             const matchesOnSpecificDate = await fetchMatchesOnSpecificDate(specificDate);
-
+            AndarBaharManual.SetFirstCard(io)
             console.log("A user connected", socket.id);
 
             // Handle socket events
@@ -628,7 +629,7 @@ const setupSocket = (server) => {
                 }
             });
 
-
+            AndarBaharManual.SetFirstCard(io)
             socket.on("disconnect", () => {
                 // console.log("A user disconnected", socket.id);
 
