@@ -29,6 +29,7 @@ app.use(process.env.WEBSITE_ROUTES,require("./app/website/matchList/Match.routes
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/ludo/baseRoute"));
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/RolletGame/BaseRoute"));
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/lottery/routes/index"));
+app.use(process.env.WEBSITE_ROUTES,require("./app/website/andarBaharManual/baseRoute"))
 
 
 
