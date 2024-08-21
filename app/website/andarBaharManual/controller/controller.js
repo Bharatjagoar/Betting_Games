@@ -37,8 +37,7 @@ module.exports.createBet = async (req, res) => {
 
 
 module.exports.readBetsfromType = async (req, res) => {
-    const { type } = req.params;
-    console.log(type)
+    // console.log(type)
     try {
         const find = await betsDB.find()
         console.log(find)
@@ -64,9 +63,47 @@ module.exports.readBetsfromType = async (req, res) => {
         const result = await betsDB.aggregate(pipeline);
 
         console.log(result);
-        res.send();
+        res.status(200).send({message:"Successfully done",data:result});
     } catch (error) {
         console.log(error);
-        res.status(500).send(error);
+        res.status(500).send({message:error,data:null});
     }
 };
+function processCardsCodes(cardsCodes) {
+    const firstItem = cardsCodes[0];
+  
+    const andar = [];
+    const bahar = [];
+  
+    for (let i = 1; i < cardsCodes.length; i++) {
+      if (i % 2 === 1) {
+        andar.push(cardsCodes[i]);
+      } else {
+        bahar.push(cardsCodes[i]);
+      }
+    }
+  
+    return {
+      firstItem,
+      andar,
+      bahar
+    };
+  }
+  
+
+
+module.exports.getCardsArr = async ( req , res )=>{
+    
+    console.log("hellow")
+    try {
+        const arr = await cardStoreModel.findOne({}).select("cardsCodes")
+        let data  = processCardsCodes(arr.cardsCodes)
+        // console.log(andar,bahar)
+        // res.send("fdsafdsa")
+        
+        res.status(200).send({message:"got the array",data})
+    } catch (error) {
+        console.log(error)
+        res.status(400).send({ message: "error occured", data: null })
+    }
+}
