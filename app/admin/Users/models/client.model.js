@@ -8,6 +8,10 @@ const clientschema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    explore: {
+        type: Number,
+        default: 0
+    },
     Password: {
         type: String,
         required: true,
