@@ -6,7 +6,7 @@ const Lotterymodel = require("../model/lotteryModel");
 // const betDB = require("../../Bets/bets.model.js")
 const AmountDB = require("../../manualAmount model/Amounts.js")
 const clientModel = require("../../../admin/Users/models/client.model.js")
-
+const statementdb = require("../../statements copy/models/statement.model.js")
 
 
 //////// from here 
@@ -22,13 +22,25 @@ module.exports.createBet = async (req, res) => {
     let createamount
     let updateamount
     // obj[`${betType}`] = openNumber
+    const Description = "Created Lottery bet"
     try {
+
         const findtheuser = await clientModel.findById(UserId)
         if(findtheuser.coins<ammount){
             res.status(200).send({message:"Not enough coins",data:null})
         }
+        
         const createBet = await lotteryBetModel.create(req.body)
         console.log(createBet)
+        let prevbal =findtheuser.coins-ammount
+        // const createLog = await statementdb.create({
+        //     UserId:UserId,
+        //     UserType:"client",
+        //     Description:Description,
+        //     Debit:ammount,
+        //     PrevBalance:prevbal
+        // })
+        // console.log(createLog)
         let amt = ammount
         ammount = 0 - ammount
 
@@ -129,32 +141,68 @@ module.exports.readBetsfromType = async (req, res) => {
 
 
 
+// const createLog = await statementdb.create({
+//     UserId:UserId,
+//     UserType:"client",
+//     Description:Description,
+//     Debit:ammount,
+//     PrevBalance:prevbal
+// })
+
+
+
+
 // Function to update coins and explore fields based on bet results
 async function updateBetResults(winners, losers) {
+    // let desc = "lottery number won "
     try {
         // Update winners: Set explore to 0 and add the amount to coins
         for (const winner of winners) {
+            let desc = "Lottery bet Won";
+
+            let profitShare = ((winner.ammount)/10)+(winner.ammount);
             const exp = 0 - winner.ammount;
             console.log(winner.ammount, winner.UserId)
+            let prevbal = winner.coins-winner.ammount
+            
             const winnerUpdate = await clientModel.findByIdAndUpdate(
                 winner.UserId,
                 {
-                    $inc: { coins: winner.ammount, explore: exp } // Increase coins by the winning amount
+                    $inc: { coins: profitShare, explore: exp } // Increase coins by the winning amount
                     // $inc: { explore: exp }             // Deduct explore to 0
-                }, { new: true }
+                }
             );
+            const respo = await statementdb.create({
+                UserId:winner.UserId,
+                UserType:"client",
+                PrevBalance:winnerUpdate.coins+winner.ammount,
+                Credit:profitShare,
+                Description:desc
+            })
             console.log("Updated winner:", winnerUpdate);
+            console.log("winner from windows ",winner)
         }
 
         // Update losers: Set explore to 0
+        console.log(losers)
         for (const loser of losers) {
+            
+            let desc = "Lottery bet Lost";
             const exp = 0 - loser.ammount;
             const loserUpdate = await clientModel.findByIdAndUpdate(
                 loser.UserId,
                 {
                     $inc: { explore: exp }  // Deduct explore to 0
-                }, { new: true }
+                }
             );
+            console.log("looser statement",loserUpdate)
+            const createLog = await statementdb.create({
+                UserId:loser.UserId,
+                UserType:"client",
+                Description:desc,
+                Debit:loser.ammount,
+                PrevBalance:loserUpdate.coins+loser.ammount
+            })
             console.log("Updated loser:", loserUpdate);
         }
 
@@ -274,14 +322,14 @@ module.exports.SetBettingNumber = async (req, res) => {
 
 
         // here we are deleting the bets
-        // const findAnddeleteuser = await lotteryBetModel.find({ betType: querytype })
-        // for (let user of findAnddeleteuser) {
-        //     console.log(user, "hello world")
-        //     await lotteryBetModel.findByIdAndDelete(user._id)
-        // }
+        const findAnddeleteuser = await lotteryBetModel.find({ betType: querytype })
+        for (let user of findAnddeleteuser) {
+            console.log(user, "hello world")
+            await lotteryBetModel.findByIdAndDelete(user._id)
+        }
         // console.log(findAnddelete)
 
-        res.send({ message: "Betting number set and results updated." });
+        res.status(200).send({ message: "Betting number set and results updated." });
     } catch (error) {
         console.log("Error:", error);
         res.status(500).send(error);
@@ -292,9 +340,9 @@ module.exports.SetBettingNumber = async (req, res) => {
 module.exports.result = async (req, res) => {
     console.log("hello world")
     try {
-        const foundDoc = await lotteryModel.findOne({})
+        const foundDoc = await Lotterymodel.findOne({})
         console.log(foundDoc)
-        res.send(foundDoc)
+        res.status().send({message:"successful",data:foundDoc})
     } catch (error) {
         console.log(error)
         res.send(error)

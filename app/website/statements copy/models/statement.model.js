@@ -17,18 +17,21 @@ const statementSchema = new mongoose.Schema(
     },
     Credit: {
       type: Number,
+      default:0,
     },
     Debit: {
       type: Number,
+      default:0
     },
     Commission: {
       type: Number,
+      default:0
     },
     Balance: {
-      type: Number,
+      type: Number
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Statement", statementSchema);
+module.exports = mongoose.model("Statement2", statementSchema);
