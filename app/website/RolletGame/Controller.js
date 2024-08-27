@@ -1,6 +1,7 @@
 const RolletUserDB = require("./RoulletUserModel")
 const dataDB = require("./bettingdataModel")
 // const {setupSocket} = require("../../../Socket/socket")
+const clientModel = require("../../admin/Users/models/client.model")
 
 // const io = setupSocket()
 let red=[1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]
@@ -8,8 +9,7 @@ let black = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]
 
 module.exports.Main=async ( req , res)=>{
     console.log("hello world ")
-    io.emit("hellow","helloworld")
-    res.send()
+    res.status(200).send({message:"working fine"})
 }
 
 module.exports.createUser = async (req,res)=>{
@@ -95,7 +95,7 @@ module.exports.getNumber = async (req,res)=>{
     console.log("from getnumber")
     let colors
     // console.log(req.params)
-    const {number,userId} = req.params
+    const {number,userId,amount} = req.params
     console.log(number)
     let responumber =getRandomNumberExcluding(number)
     console.log(number,responumber)
@@ -153,7 +153,7 @@ module.exports.getNumber = async (req,res)=>{
         console.log("hello")
         console.log(error)
     }
-    // res.send()
+    
 }
 
 module.exports.getDataAdmin =async (req,res)=>{

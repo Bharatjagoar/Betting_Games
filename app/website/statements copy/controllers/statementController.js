@@ -27,7 +27,7 @@ exports.getStatementById = async (req, res) => {
     const response = await statementModel.find(
       {userId: id}
     );
-    console.log(response,"statemnet response")
+    console.log(response)
     if (!response){
       return res.status(404).json({
         message: "statement not found",
