@@ -30,6 +30,7 @@ app.use(process.env.WEBSITE_ROUTES,require("./app/website/ludo/baseRoute"));
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/RolletGame/BaseRoute"));
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/lottery/routes/index"));
 app.use(process.env.WEBSITE_ROUTES,require("./app/website/andarBaharManual/baseRoute"))
+app.use(process.env.WEBSITE_ROUTES,require("./app/website/statements copy/routes/Statement.routes"))
 
 
 

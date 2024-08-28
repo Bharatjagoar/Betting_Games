@@ -159,19 +159,19 @@ async function updateBetResults(winners, losers) {
         // Update winners: Set explore to 0 and add the amount to coins
         for (const winner of winners) {
             let desc = "Lottery bet Won";
-
-            let profitShare = ((winner.ammount)/10)+(winner.ammount);
+            let profitShare = ((winner.ammount)/10);
             const exp = 0 - winner.ammount;
             console.log(winner.ammount, winner.UserId)
             let prevbal = winner.coins-winner.ammount
-            
+            let finalbal = profitShare+(winner.ammount)
             const winnerUpdate = await clientModel.findByIdAndUpdate(
                 winner.UserId,
                 {
-                    $inc: { coins: profitShare, explore: exp } // Increase coins by the winning amount
+                    $inc: { coins: finalbal, explore: exp } // Increase coins by the winning amount
                     // $inc: { explore: exp }             // Deduct explore to 0
                 }
             );
+            console.log("winnerudpated",winnerUpdate.coins,"ammount",winner)
             const respo = await statementdb.create({
                 UserId:winner.UserId,
                 UserType:"client",
@@ -201,7 +201,7 @@ async function updateBetResults(winners, losers) {
                 UserType:"client",
                 Description:desc,
                 Debit:loser.ammount,
-                PrevBalance:loserUpdate.coins+loser.ammount
+                PrevBalance:loserUpdate.coins+loserUpdate.explore
             })
             console.log("Updated loser:", loserUpdate);
         }
